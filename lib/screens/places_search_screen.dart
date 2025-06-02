@@ -1,0 +1,179 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sepesha_app/Utilities/global_variables.dart';
+import 'package:sepesha_app/Utilities/secret_variables.dart';
+import 'package:sepesha_app/models/direction_model.dart';
+import 'package:sepesha_app/models/predicted_places.dart';
+import 'package:sepesha_app/screens/info_handler/app_info.dart';
+import 'package:sepesha_app/service/request_assistance.dart';
+
+class PlacesSearchScreen extends StatefulWidget {
+  const PlacesSearchScreen({super.key});
+
+  @override
+  State<PlacesSearchScreen> createState() => _PlacesSearchScreenState();
+}
+
+class _PlacesSearchScreenState extends State<PlacesSearchScreen> {
+  late AppInfo _appInfo;
+  List<PredictedPlaces> _predictedPlaces = [];
+  final TextEditingController _pickupController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
+
+  @override
+  void dispose() {
+    _pickupController.dispose();
+    _destinationController.dispose();
+    super.dispose();
+  }
+
+  findPlaceAutoCompleteSearch(String inputText) async {
+    if (inputText.length > 1) {
+      String placeAutoCompleteUrl =
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=$mapKey&components=country:TZ';
+
+      var responseAutoCompleteSearch = await RequestAssistance.receiveRequest(
+        placeAutoCompleteUrl,
+      );
+      print(responseAutoCompleteSearch);
+
+      if (responseAutoCompleteSearch ==
+          'Error occured. Failed to receive request.') {
+        return;
+      }
+      if (responseAutoCompleteSearch["status"] == "OK") {
+        var placePredictions = responseAutoCompleteSearch["predictions"];
+        var predictedPlacesList =
+            (placePredictions as List)
+                .map((e) => PredictedPlaces.fromJson(e))
+                .toList();
+        setState(() {
+          _predictedPlaces = predictedPlacesList;
+        });
+      }
+    }
+  }
+
+  getPlaceDirectionDetailes(String? placeId, context) async {
+    String placesDirectionDetailsUrl =
+        'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey';
+
+    var responseApi = await RequestAssistance.receiveRequest(
+      placesDirectionDetailsUrl,
+    );
+    print(responseApi);
+
+    if (responseApi == 'Error occured. Failed to receive request.') {
+      return;
+    }
+    if (responseApi["status"] == "OK") {
+      DirectionModel _directionModel = DirectionModel();
+      _directionModel.locationName = responseApi["result"]["name"];
+      _directionModel.locationId = placeId;
+      _directionModel.locationLatitude =
+          responseApi["result"]["geometry"]["location"]["lat"];
+      _directionModel.locationLongitude =
+          responseApi["result"]["geometry"]["location"]["lng"];
+
+      setState(() {
+        UserdropOffAddress = _directionModel.locationName!;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _appInfo = Provider.of<AppInfo>(context, listen: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Search Ride'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const Text(
+              'Where are you going?',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            _buildTextField(
+              _pickupController,
+              'Pickup location',
+              Icons.my_location,
+            ),
+            const SizedBox(height: 10),
+            _buildTextField(
+              _destinationController,
+              'Destination',
+              Icons.location_on,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                // Simulate search or navigation logic
+                debugPrint(
+                  'Searching ride from ${_pickupController.text} to ${_destinationController.text}',
+                );
+              },
+              icon: const Icon(Icons.search),
+              label: const Text('Find Ride'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                backgroundColor: Colors.deepPurple,
+              ),
+            ),
+            const SizedBox(height: 30),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _predictedPlaces.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(_predictedPlaces[index].mainText!),
+                    subtitle: Text(_predictedPlaces[index].secondaryText!),
+                    onTap: () {
+                      //
+                      getPlaceDirectionDetailes(
+                        _predictedPlaces[index].placeId,
+                        context,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint,
+    IconData icon,
+  ) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon),
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      onChanged: (value) {
+        findPlaceAutoCompleteSearch(value);
+      },
+    );
+  }
+}
