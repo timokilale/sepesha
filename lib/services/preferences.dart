@@ -8,6 +8,8 @@ class PrefKeys {
   static const String darkMode = "dark_mode";
 
   static const String refreshToken = "refreshToken";
+    static const String tokenExpiry = "tokenExpiry";
+
 
   //user info
   static const String firstName = "first_name";
@@ -25,6 +27,8 @@ class Preferences extends BasePreferences {
   Future<String?> get apiToken async => await fetch<String?>(PrefKeys.apiToken);
   Future<String?> get refreshToken async =>
       await fetch<String?>(PrefKeys.refreshToken);
+        Future<String?> get tokenExpiry async =>
+      await fetch<String?>(PrefKeys.tokenExpiry);
   Future<int?> get phoneNumber async => await fetch<int?>(PrefKeys.phoneNumber);
 
   Future<String?> get language async => await fetch<String?>(PrefKeys.language);

@@ -8,6 +8,17 @@ class SessionManager {
   String? _lastname;
   String? _middlename;
   String? _email;
+  String? _distanceCovered;
+
+  void setDistanceCovered(String distance) {
+    print('Distance obtained and to be saved is $distance');
+    _distanceCovered = distance;
+  }
+
+  String get distanceCovered {
+    if (_distanceCovered == null) throw Exception("distance is NULL");
+    return _distanceCovered!;
+  }
 
   int get phone {
     if (_phone == null) throw Exception("phone is NULL");

@@ -3,7 +3,7 @@ import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_images.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/components/app_button.dart';
-import 'package:sepesha_app/service/auth_services.dart';
+import 'package:sepesha_app/services/auth_services.dart';
 import 'package:sepesha_app/services/session_manager.dart';
 
 class AccountScreen extends StatelessWidget {

@@ -5,7 +5,7 @@ import 'package:sepesha_app/Utilities/secret_variables.dart';
 import 'package:sepesha_app/models/direction_model.dart';
 import 'package:sepesha_app/models/predicted_places.dart';
 import 'package:sepesha_app/screens/info_handler/app_info.dart';
-import 'package:sepesha_app/service/request_assistance.dart';
+import 'package:sepesha_app/services/request_assistance.dart';
 
 class PlacesSearchScreen extends StatefulWidget {
   const PlacesSearchScreen({super.key});

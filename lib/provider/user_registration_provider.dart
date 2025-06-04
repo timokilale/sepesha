@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sepesha_app/models/driver_model.dart';
 import 'package:sepesha_app/models/vehicle_model.dart';
 import 'package:sepesha_app/screens/auth/otp_screen.dart';
-import 'package:sepesha_app/service/auth_services.dart';
+import 'package:sepesha_app/services/auth_services.dart';
 import 'package:sepesha_app/services/session_manager.dart';
 
 class UserRegistrationProvider with ChangeNotifier {

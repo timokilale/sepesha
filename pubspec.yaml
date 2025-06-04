@@ -64,6 +64,7 @@ dependencies:
   flutter_polyline_points: ^2.1.0
   geocoding: ^4.0.0
   jwt_decoder: ^2.0.1
+  action_slider: ^0.7.0
 
   
   
