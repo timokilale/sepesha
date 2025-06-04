@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/dashboard_viewmodel.dart';
+import 'package:sepesha_app/Driver/dasboard/presentation/widgets/driver_status_toggle.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/widgets/ride_request_card.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/widgets/wallet_card.dart';
 import 'package:sepesha_app/Driver/history/presentation/history_screen.dart';
@@ -82,40 +83,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 // Dashboard Content Overlay
                 if (viewModel.currentRide == null) ...[
+                  // In your DashboardScreen build method:
                   Positioned(
-                    top: 16,
+                    bottom: 16,
                     left: 16,
                     right: 16,
                     child: Column(
                       children: [
-                        // WalletCard(
-                        //   driver: viewModel.driver!,
-                        //   onTap: () {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) => const WalletScreen(),
-                        //       ),
-                        //     );
-                        //   },
-                        // ),
-                        const SizedBox(height: 12),
-                        LiveStatusCard(
-                          isOnline: viewModel.isOnline,
-                          onToggle: viewModel.toggleOnlineStatus,
-                          // In the LiveStatusCard onLivePressed callback:
-                          onLivePressed: () {
-                            if (viewModel.isOnline &&
-                                viewModel.currentRide != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => LiveScreen(
-                                        rideId: viewModel.currentRide!.id,
-                                      ),
-                                ),
-                              );
+                        DriverStatusToggle(
+                          initialStatus: viewModel.isOnline,
+                          onStatusChanged: (bool isOnline) async {
+                            try {
+                              viewModel.toggleOnlineStatus();
+                              return true; // Return true if successful
+                            } catch (e) {
+                              return false; // Return false if failed
                             }
                           },
                         ),
@@ -128,7 +110,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 if (viewModel.pendingRides.isNotEmpty &&
                     viewModel.currentRide == null)
                   Positioned(
-                    bottom: 16,
+                    top: 16,
                     left: 16,
                     right: 16,
                     child: Container(
