@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:sepesha_app/screens/dashboard/dashboard.dart';
-import 'package:sepesha_app/service/auth_services.dart';
+import 'package:sepesha_app/services/auth_services.dart';
 import 'package:sepesha_app/services/session_manager.dart';
 
 class OTPProvider with ChangeNotifier {
