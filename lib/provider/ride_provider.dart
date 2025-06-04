@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'package:http/http.dart' as http;
+import 'package:sepesha_app/models/ride_option.dart';
 
 enum RideFlowState {
   idle,
@@ -12,24 +14,6 @@ enum RideFlowState {
   driverAssigned,
   arrived,
   onTrip,
-}
-
-class RideOption {
-  final String? name;
-  final String? price;
-  final IconData? icon;
-  final String? description;
-  final Color? color;
-  final String? vehicleType;
-
-  RideOption(
-    this.name,
-    this.price,
-    this.icon,
-    this.description,
-    this.color,
-    this.vehicleType,
-  );
 }
 
 class RideProvider with ChangeNotifier {
@@ -49,7 +33,6 @@ class RideProvider with ChangeNotifier {
   bool _isLoading = false;
   bool _showRideResults = false;
   bool _hideLocationCard = false;
-  final Location _locationService = Location();
   List<LatLng> _polylineCoordinates = []; // Added for polyline storage
 
   // Map controller
@@ -151,11 +134,6 @@ class RideProvider with ChangeNotifier {
       // Handle errors
       print("Error getting location: $e");
     }
-  }
-
-  Future<String> _simulateGeocoding(LatLng location) async {
-    await Future.delayed(Duration(milliseconds: 500));
-    return "Your current location";
   }
 
   void setPickupLocation(LatLng location, String address) {
@@ -298,4 +276,33 @@ class RideProvider with ChangeNotifier {
       '2 Wheeler',
     ),
   ];
+
+  /// Calculates the total distance covered between pickup and destination using Google Directions API.
+  /// Returns the distance as a string (e.g., '5.2 km') or an error message.
+  Future<String> calculateDistanceCovered(String mapKey) async {
+    if (_currentLocation == null || _destinationLocation == null) {
+      return "Location(s) not set";
+    }
+    final origin = _currentLocation!;
+    final destination = _destinationLocation!;
+    final url =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$mapKey';
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) {
+        return "Could not get distance";
+      }
+      final data = jsonDecode(response.body);
+      if (data["status"] != "OK") {
+        return "Could not get distance";
+      }
+      final distanceText = data["routes"][0]["legs"][0]["distance"]["text"];
+      // Optionally, store in provider for UI access
+      // _distanceCovered = distanceText;
+      // notifyListeners();
+      return distanceText;
+    } catch (e) {
+      return "Could not get distance";
+    }
+  }
 }
