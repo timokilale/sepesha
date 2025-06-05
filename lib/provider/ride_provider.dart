@@ -29,6 +29,7 @@ class RideProvider with ChangeNotifier {
   LatLng? _destinationLocation;
   String _pickupAddress = 'Current location';
   String _destinationAddress = 'Where to?';
+  String _distanceCovered = ''; // Added to store distance
   bool _isLocationLoading = true;
   bool _isLoading = false;
   bool _showRideResults = false;
@@ -57,6 +58,7 @@ class RideProvider with ChangeNotifier {
   LatLng? get destinationLocation => _destinationLocation;
   String get pickupAddress => _pickupAddress;
   String get destinationAddress => _destinationAddress;
+  String get distanceCovered => _distanceCovered; // Added getter for distance
   bool get isLocationLoading => _isLocationLoading;
   bool get isLoading => _isLoading;
   bool get showRideResults => _showRideResults;
@@ -280,10 +282,10 @@ class RideProvider with ChangeNotifier {
   /// Calculates the total distance covered between pickup and destination using Google Directions API.
   /// Returns the distance as a string (e.g., '5.2 km') or an error message.
   Future<String> calculateDistanceCovered(String mapKey) async {
-    if (_currentLocation == null || _destinationLocation == null) {
+    if (_pickupLocation == null || _destinationLocation == null) {
       return "Location(s) not set";
     }
-    final origin = _currentLocation!;
+    final origin = _pickupLocation!;
     final destination = _destinationLocation!;
     final url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=$mapKey';
@@ -297,9 +299,9 @@ class RideProvider with ChangeNotifier {
         return "Could not get distance";
       }
       final distanceText = data["routes"][0]["legs"][0]["distance"]["text"];
-      // Optionally, store in provider for UI access
-      // _distanceCovered = distanceText;
-      // notifyListeners();
+      // Store in provider for UI access
+      _distanceCovered = distanceText;
+      notifyListeners();
       return distanceText;
     } catch (e) {
       return "Could not get distance";

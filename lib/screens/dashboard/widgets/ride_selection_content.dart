@@ -4,6 +4,7 @@ import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/components/home/sheet_handle.dart';
 import 'package:sepesha_app/models/ride_option.dart';
 import 'package:sepesha_app/provider/ride_provider.dart';
+import 'package:sepesha_app/services/session_manager.dart';
 
 class RideSelectionContent extends StatelessWidget {
   final RideProvider provider;
@@ -11,10 +12,29 @@ class RideSelectionContent extends StatelessWidget {
   RideSelectionContent({required this.provider});
 
   // Add separate lists for 2 Wheeler and 4 Wheeler using the correct RideOption constructor (positional arguments)
-  final List<RideOption> twoWheelerOptions = [
+
+  final distance = SessionManager.instance.distanceCovered;
+
+  int totalFair({
+    required int BestPrice,
+    required double vehicleMultiplier,
+    required int pricePerKilometer,
+  }) {
+    double newDistance = double.parse(distance.split(" ")[0]);
+
+    final amount =
+        BestPrice +
+        (vehicleMultiplier * pricePerKilometer * newDistance).toInt();
+
+    // Round to the nearest 500
+    int roundedAmount = ((amount + 250) ~/ 500) * 500;
+    return roundedAmount;
+  }
+
+  List<RideOption> get twoWheelerOptions => [
     RideOption(
       'Bodaboda',
-      'TZS 500',
+      'TZS ${totalFair(BestPrice: 3000, vehicleMultiplier: 1.0, pricePerKilometer: 400)}',
       Icons.motorcycle,
       'Total weight < 150kg',
       Colors.blue,
@@ -22,7 +42,7 @@ class RideSelectionContent extends StatelessWidget {
     ),
     RideOption(
       'Bajaji',
-      'TZS 800',
+      'TZS ${totalFair(BestPrice: 5000, vehicleMultiplier: 1.4, pricePerKilometer: 700)}',
       Icons.motorcycle,
       'Total weight < 1300kg',
       Colors.green,
@@ -30,7 +50,7 @@ class RideSelectionContent extends StatelessWidget {
     ),
     RideOption(
       'Guta',
-      'TZS 800',
+      'TZS ${totalFair(BestPrice: 7000, vehicleMultiplier: 1.6, pricePerKilometer: 900)}',
       Icons.motorcycle,
       'Total weight < 1300kg',
       Colors.green,
@@ -38,10 +58,10 @@ class RideSelectionContent extends StatelessWidget {
     ),
   ];
 
-  final List<RideOption> fourWheelerOptions = [
+  List<RideOption> get fourWheelerOptions => [
     RideOption(
       'Carry',
-      'TZS 1500',
+      'TZS ${totalFair(BestPrice: 10500, vehicleMultiplier: 1.9, pricePerKilometer: 1400)}',
       Icons.directions_car,
       'Total weight < 1,000kg',
       Colors.orange,
@@ -49,7 +69,7 @@ class RideSelectionContent extends StatelessWidget {
     ),
     RideOption(
       'Townace ',
-      'TZS 2500',
+      'TZS ${totalFair(BestPrice: 12000, vehicleMultiplier: 2.1, pricePerKilometer: 1600)}',
       Icons.directions_car,
       'Total weight < 1,500kg',
       Colors.purple,
@@ -207,15 +227,15 @@ class RideSelectionContent extends StatelessWidget {
                       style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.star, color: Colors.amber, size: 14),
-                        const SizedBox(width: 4),
-                        const SizedBox(width: 8),
-                        Icon(Icons.people, color: Colors.grey[400], size: 14),
-                        const SizedBox(width: 4),
-                      ],
-                    ),
+                    // Row(
+                    //   children: [
+                    //     Icon(Icons.star, color: Colors.amber, size: 14),
+                    //     const SizedBox(width: 4),
+                    //     const SizedBox(width: 8),
+                    //     Icon(Icons.people, color: Colors.grey[400], size: 14),
+                    //     const SizedBox(width: 4),
+                    //   ],
+                    // ),
                   ],
                 ),
               ),
