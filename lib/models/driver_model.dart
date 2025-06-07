@@ -9,6 +9,7 @@ class Driver {
   final String? licenseNumber;
   final String? licenseExpiry;
   final String? password;
+  final String? userType;
   final File? profileImage;
 
   Driver({
@@ -20,6 +21,7 @@ class Driver {
     this.licenseNumber,
     this.licenseExpiry,
     this.password,
+    this.userType,
     this.profileImage,
   });
 }

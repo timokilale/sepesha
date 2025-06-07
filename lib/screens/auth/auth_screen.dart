@@ -12,6 +12,7 @@ import 'package:sepesha_app/screens/auth/driver/personal_info_screen.dart';
 import 'package:sepesha_app/screens/auth/driver/registration_stepper.dart';
 import 'package:sepesha_app/screens/auth/otp_screen.dart';
 import 'package:sepesha_app/screens/auth/user_info_registration.dart';
+import 'package:sepesha_app/screens/auth/vendor/vendor_registration_screen.dart';
 import 'package:sepesha_app/screens/auth/vendor_stepper_screen.dart';
 import 'package:sepesha_app/screens/dashboard/dashboard.dart';
 import 'package:sign_in_button/sign_in_button.dart';
@@ -136,7 +137,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => VendorStepperScreen(),
+                            builder: (context) => VendorRegistrationScreen(),
                           ),
                         );
                       },

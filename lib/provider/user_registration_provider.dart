@@ -41,6 +41,29 @@ class UserRegistrationProvider with ChangeNotifier {
   }
 
 
+  Future<void> userRegister(BuildContext context) async {
+    _setLoading(true);
+
+    try {
+
+
+
+
+
+
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => OTPScreen()),
+      );
+
+    } catch (e) {
+      _setLoading(false);
+      print('Error1: $e');
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+    }
+  }
+
 
   void setCurrentStep(int step) {
     _currentStep = step;

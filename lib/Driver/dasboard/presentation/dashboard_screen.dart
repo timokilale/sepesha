@@ -258,7 +258,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildDrawer(BuildContext context) {
-    final driver = Driver(
+    final driver = User(
       id: 'driver123',
       name: 'John Driver',
       email: 'john.driver@example.com',

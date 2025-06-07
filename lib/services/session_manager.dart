@@ -1,3 +1,8 @@
+import '../Driver/model/user_model.dart';
+import '../models/driver_model.dart';
+import '../models/driver_document_model.dart';
+import 'package:sepesha_app/models/vehicle_model.dart';
+
 class SessionManager {
   SessionManager._();
   static final SessionManager _instance = SessionManager._();
@@ -9,6 +14,88 @@ class SessionManager {
   String? _middlename;
   String? _email;
   String? _distanceCovered;
+  Driver? _user;
+  Vehicle? _vehicle;
+  Map<String, dynamic> _documents = {};
+  Map<String, bool> _documentCompletionStatus = {};
+  List<DriverDocumentModel> _completedDocuments = [];
+
+
+
+
+  void setUser(Driver user) {
+    _user = user;
+  }
+
+  Driver? get user {
+    if (_user == null) throw Exception("user is NULL");
+    return _user;
+  }
+
+  void setVehicle(Vehicle vehicle) {
+    _vehicle = vehicle;
+  }
+
+  Vehicle? get vehicle {
+    if (_vehicle == null) throw Exception("vehicle is NULL");
+    return _vehicle;
+  }
+
+  void addDocument(String key, dynamic document) {
+    _documents[key] = document;
+  }
+
+  void markDocumentComplete(String key, {
+    required dynamic file,
+    String? idNumber,
+    String? expiryDate,
+  }) {
+    _documents[key] = {
+      'file': file,
+      'idNumber': idNumber,
+      'expiryDate': expiryDate,
+      'isComplete': true,
+    };
+    _documentCompletionStatus[key] = true;
+  }
+
+  bool isDocumentComplete(String key) {
+    // First check explicit completion status
+    if (_documentCompletionStatus.containsKey(key)) {
+      return _documentCompletionStatus[key]!;
+    }
+
+    // Then check if document exists with all required fields
+    if (!_documents.containsKey(key)) {
+      return false;
+    }
+
+    final doc = _documents[key];
+    if (doc == null) return false;
+
+    // Must have a file
+    if (doc['file'] == null) return false;
+
+    return true;
+  }
+
+  Map<String, dynamic> get documents => _documents;
+
+  List<DriverDocumentModel> get completedDocuments => _completedDocuments;
+
+  void addCompletedDocument(DriverDocumentModel document) {
+    _completedDocuments.add(document);
+  }
+
+  void setCompletedDocuments(List<DriverDocumentModel> documents) {
+    _completedDocuments = documents;
+  }
+
+  void clearDocuments() {
+    _documents = {};
+    _documentCompletionStatus = {};
+    _completedDocuments = [];
+  }
 
   void setDistanceCovered(String distance) {
     print('Distance obtained and to be saved is $distance');

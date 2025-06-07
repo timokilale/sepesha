@@ -3,7 +3,7 @@ import 'package:sepesha_app/Driver/model/user_model.dart';
 import 'package:sepesha_app/helper/helper.dart';
 
 class WalletCard extends StatelessWidget {
-  final Driver driver;
+  final User driver;
   final VoidCallback onTap;
 
   const WalletCard({super.key, required this.driver, required this.onTap});

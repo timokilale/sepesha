@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:ipf_flutter_starter_pack/services.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:sepesha_app/Utilities/app_color.dart';
@@ -374,6 +375,13 @@ class _DestinationCardState extends State<_DestinationCard> {
     );
   }
 
+
+  // socketManager(){
+  //   SocketManager _socketManager = SocketManager.instance;
+  //   _socketManager  .connect(url, onConnected)
+  // }
+
+  
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<RideProvider>(context);

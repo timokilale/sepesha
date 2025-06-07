@@ -8,13 +8,13 @@ class DashboardViewModel with ChangeNotifier {
 
   bool _isLoading = true;
   bool _isOnline = false;
-  Driver? _driver;
+  User? _driver;
   List<Ride> _pendingRides = [];
   Ride? _currentRide;
 
   bool get isLoading => _isLoading;
   bool get isOnline => _isOnline;
-  Driver? get driver => _driver;
+  User? get driver => _driver;
   List<Ride> get pendingRides => _pendingRides;
   Ride? get currentRide => _currentRide;
 
@@ -29,7 +29,7 @@ class DashboardViewModel with ChangeNotifier {
   }
 
   Future<void> _loadDriverData() async {
-    _driver = await _repository.getDriverData();
+    // _driver = await _repository.getDriverData();
     notifyListeners();
   }
 

@@ -52,7 +52,7 @@ class _RegistrationStepperScreenState extends State<RegistrationStepperScreen> {
                   child: PageView(
                     controller: _pageController,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: const [
+                    children:  [
                       PersonalInfoScreen(),
                       VehicleInfoScreen(),
                       DocumentUploadScreen(),

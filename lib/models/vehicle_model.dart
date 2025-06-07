@@ -8,9 +8,6 @@ class Vehicle {
   final String? plateNumber;
   final File? frontImage;
   final File? backImage;
-  final File? leftImage;
-  final File? rightImage;
-
   Vehicle({
     this.year,
     this.manufacturer,
@@ -19,7 +16,6 @@ class Vehicle {
     this.plateNumber,
     this.frontImage,
     this.backImage,
-    this.leftImage,
-    this.rightImage,
+
   });
 }

@@ -9,7 +9,7 @@ class WalletScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Wallet')),
-      body: FutureBuilder<Driver>(
+      body: FutureBuilder<User>(
         future: WalletRepository().getDriverData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sepesha_app/Utilities/app_color.dart' show AppColor;
 import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/models/driver_model.dart';
 import 'package:sepesha_app/provider/registration_provider.dart';
 import 'package:sepesha_app/screens/auth/driver/widgets/image_upload_widget.dart';
+import 'package:sepesha_app/services/session_manager.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({super.key});
@@ -32,6 +34,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   String? _selectedCity;
   File? _profileImage;
   bool _isChecked = false;
+  bool _photoMission = false;
 
   @override
   void dispose() {
@@ -71,131 +74,134 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       child: Form(
         key: _formKey,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
           children: [
-            // Profile Picture Section
             Column(
               children: [
-                ImageUploadWidget(
-                  image: _profileImage,
-                  isCircle: false,
-                  onImageSelected: (file) {
-                    setState(() {
-                      _profileImage = file;
-                    });
+                // Profile Picture Section
+                Column(
+                  children: [
+                    ImageUploadWidget(
+                      image: _profileImage,
+                      isCircle: false,
+                      onImageSelected: (file) {
+                        setState(() {
+                          _profileImage = file;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Upload a Profile Picture',
+                      style: TextStyle(fontSize: 14),
+                    ),
+
+                    _photoMission
+                        ?  Text(
+                          'Please upload photo',
+                          style: TextStyle(fontSize: 14, color: AppColor.primary),
+                        )
+                        : SizedBox.shrink(),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Name Fields
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _firstNameController,
+                        label: 'First Name',
+                        validator:
+                            (value) =>
+                                value?.isEmpty ?? true ? 'Required' : null,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _lastNameController,
+                        label: 'Last Name',
+                        validator:
+                            (value) =>
+                                value?.isEmpty ?? true ? 'Required' : null,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Email Field
+                _buildTextField(
+                  controller: _emailController,
+                  label: 'Email Address',
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) return 'Required';
+                    if (!value!.contains('@')) return 'Invalid email';
+                    return null;
                   },
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Upload a Profile Picture',
-                  style: TextStyle(fontSize: 16),
+                const SizedBox(height: 16),
+
+                // Phone Field
+                _buildTextField(
+                  controller: _phoneController,
+                  label: 'Phone Number',
+                  keyboardType: TextInputType.phone,
+                  validator:
+                      (value) => value?.isEmpty ?? true ? 'Required' : null,
                 ),
+                const SizedBox(height: 16),
+
+                // City Dropdown
+                _buildCityDropdown(),
+                const SizedBox(height: 16),
+
+
+                // Password Fields
+                _buildTextField(
+                  controller: _passwordController,
+                  label: 'Create Strong Password',
+                  obscureText: true,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) return 'Required';
+                    if (value!.length < 6) return 'Password too short';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                _buildTextField(
+                  controller: _confirmPasswordController,
+                  label: 'Confirm Password',
+                  obscureText: true,
+                  validator: (value) {
+                    if (value != _passwordController.text)
+                      return 'Passwords do not match';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Terms Checkbox
+                _buildTermsCheckbox(),
+                const SizedBox(height: 24),
+
+                ContinueButton(
+                  onPressed: _isChecked ? () => _submitForm(provider) : () {},
+                  isLoading: false,
+                ),
+
+                // Continue Button
+                // ElevatedButton(
+                //   onPressed: _isChecked ? () => _submitForm(provider) : null,
+                //   child: const Text('Continue'),
+                // ),
               ],
             ),
-            const SizedBox(height: 24),
-
-            // Name Fields
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: _firstNameController,
-                    label: 'First Name',
-                    validator:
-                        (value) => value?.isEmpty ?? true ? 'Required' : null,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildTextField(
-                    controller: _lastNameController,
-                    label: 'Last Name',
-                    validator:
-                        (value) => value?.isEmpty ?? true ? 'Required' : null,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Email Field
-            _buildTextField(
-              controller: _emailController,
-              label: 'Email Address',
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value?.isEmpty ?? true) return 'Required';
-                if (!value!.contains('@')) return 'Invalid email';
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Phone Field
-            _buildTextField(
-              controller: _phoneController,
-              label: 'Phone Number',
-              keyboardType: TextInputType.phone,
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-            ),
-            const SizedBox(height: 16),
-
-            // City Dropdown
-            _buildCityDropdown(),
-            const SizedBox(height: 16),
-
-            // License Fields
-            _buildTextField(
-              controller: _licenseNumberController,
-              label: 'License Number',
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-            ),
-            const SizedBox(height: 16),
-
-            _buildTextField(
-              controller: _licenseExpiryController,
-              label: 'License Expiry Date (YYYY-MM-DD)',
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-            ),
-            const SizedBox(height: 16),
-
-            // Password Fields
-            _buildTextField(
-              controller: _passwordController,
-              label: 'Create Strong Password',
-              obscureText: true,
-              validator: (value) {
-                if (value?.isEmpty ?? true) return 'Required';
-                if (value!.length < 6) return 'Password too short';
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            _buildTextField(
-              controller: _confirmPasswordController,
-              label: 'Confirm Password',
-              obscureText: true,
-              validator: (value) {
-                if (value != _passwordController.text)
-                  return 'Passwords do not match';
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Terms Checkbox
-            _buildTermsCheckbox(),
-            const SizedBox(height: 24),
-
-            ContinueButton(
-              onPressed: _isChecked ? () => _submitForm(provider) : () {},
-              isLoading: false,
-            ),
-            // Continue Button
-            // ElevatedButton(
-            //   onPressed: _isChecked ? () => _submitForm(provider) : null,
-            //   child: const Text('Continue'),
-            // ),
           ],
         ),
       ),
@@ -281,20 +287,30 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
   void _submitForm(RegistrationProvider provider) {
     if (_formKey.currentState?.validate() ?? false) {
+      if (_profileImage == null) {
+        _photoMission = true;
+        return;
+      }
+
+      _photoMission = false;
+
       final driver = Driver(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         email: _emailController.text,
         phone: _phoneController.text,
         city: _selectedCity ?? '',
-        licenseNumber: _licenseNumberController.text,
-        licenseExpiry: _licenseExpiryController.text,
         password: _passwordController.text,
         profileImage: _profileImage,
+        userType: 'driver',
       );
 
+      SessionManager.instance.setUser(driver);
+
+      print('${SessionManager.instance.user.toString()}');
+
       provider.updateDriver(driver);
-      provider.setCurrentStep(1); // Move to next step
+      provider.setCurrentStep(1);
     }
   }
 }

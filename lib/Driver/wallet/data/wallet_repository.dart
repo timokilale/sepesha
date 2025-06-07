@@ -4,9 +4,9 @@
 import 'package:sepesha_app/Driver/model/user_model.dart';
 
 class WalletRepository {
-  Future<Driver> getDriverData() async {
+  Future<User> getDriverData() async {
     await Future.delayed(const Duration(seconds: 1));
-    return Driver(
+    return User(
       id: 'driver123',
       name: 'John Driver',
       email: 'john.driver@example.com',

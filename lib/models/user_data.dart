@@ -110,6 +110,8 @@ class UserData {
   final String? plateNumber;
   final String? licenceExpiry;
   final String? businessDescription;
+  final String? businessName;
+  final String? businessType;
 
   const UserData({
     required this.firstName,
@@ -128,6 +130,8 @@ class UserData {
     this.plateNumber,
     this.licenceExpiry,
     this.businessDescription,
+    this.businessName,
+    this.businessType
   });
 
   // Convert to API-ready JSON

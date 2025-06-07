@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:sepesha_app/Driver/dasboard/driver_dashboard.dart';
+import 'package:sepesha_app/Utilities/app_color.dart';
+import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/components/app_button.dart';
+import 'package:sepesha_app/models/driver_document_model.dart';
 import 'package:sepesha_app/provider/registration_provider.dart';
 import 'package:sepesha_app/screens/auth/driver/widgets/image_upload_widget.dart';
 
@@ -13,12 +16,16 @@ class DocumentCardWidget extends StatefulWidget {
   final bool requiresIdNumber;
   final bool requiresExpiryDate;
 
+  final bool isCompleted;
+
   const DocumentCardWidget({
     super.key,
     required this.title,
     required this.documentKey,
     this.requiresIdNumber = false,
     this.requiresExpiryDate = false,
+     this.isCompleted = false,
+
   });
 
   @override
@@ -30,12 +37,36 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
   final TextEditingController _expireDateController = TextEditingController();
   File? _selectedFile;
   final _formKey = GlobalKey<FormState>();
+  bool _imageError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExistingData();
+  }
 
   @override
   void dispose() {
     _idNumberController.dispose();
     _expireDateController.dispose();
     super.dispose();
+  }
+
+  void _loadExistingData() {
+    final provider = Provider.of<RegistrationProvider>(context, listen: false);
+    final documentData = provider.documents[widget.documentKey];
+
+    if (documentData != null) {
+      setState(() {
+        _selectedFile = documentData['file'];
+        if (widget.requiresIdNumber) {
+          _idNumberController.text = documentData['idNumber'] ?? '';
+        }
+        if (widget.requiresExpiryDate) {
+          _expireDateController.text = documentData['expiryDate'] ?? '';
+        }
+      });
+    }
   }
 
   @override
@@ -171,13 +202,27 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
                       onImageSelected: (file) {
                         setModalState(() {
                           _selectedFile = file;
+                          _imageError = false;
                         });
                       },
                     ),
+                    _imageError
+                        ? Text(
+                          'Please upload document file',
+                          style: AppTextStyle.smallText2(AppColor.primary),
+                        )
+                        : SizedBox.shrink(),
                     const SizedBox(height: 24),
                     ContinueButton(
                       onPressed: () {
-                        if (_validateForm()) {
+                        if (_formKey.currentState!.validate()) {
+                          if (_selectedFile == null) {
+                            setModalState(() {
+                              _imageError = true;
+                            });
+                            return;
+                          }
+
                           _completeDocument(context);
                         }
                       },
@@ -195,17 +240,8 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
     );
   }
 
-  bool _validateForm() {
-    if (_selectedFile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please upload document file')),
-      );
-      return false;
-    }
-    return _formKey.currentState?.validate() ?? false;
-  }
-
   void _completeDocument(BuildContext context) {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
       final provider = Provider.of<RegistrationProvider>(
         context,
@@ -220,119 +256,23 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
       );
       Navigator.pop(context);
       setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${widget.title} saved successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to save document: $e')));
-    }
-  }
-}
-
-class DocumentUploadScreen extends StatelessWidget {
-  const DocumentUploadScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<RegistrationProvider>(context);
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Upload Documents')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            const Text(
-              'Please upload all required documents',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 24),
-            DocumentCardWidget(
-              title: 'Driving License',
-              documentKey: 'driving_license',
-              requiresIdNumber: true,
-              requiresExpiryDate: true,
-            ),
-            const SizedBox(height: 12),
-            DocumentCardWidget(
-              title: 'LATRA Sticker',
-              documentKey: 'latra_sticker',
-              requiresExpiryDate: true,
-            ),
-            const SizedBox(height: 12),
-            DocumentCardWidget(
-              title: 'Vehicle Registration',
-              documentKey: 'vehicle_registration',
-              requiresIdNumber: true,
-            ),
-            const SizedBox(height: 12),
-            DocumentCardWidget(
-              title: 'Plate Number',
-              documentKey: 'plate_number',
-            ),
-            const SizedBox(height: 32),
-            Row(
-              children: [
-                Expanded(
-                  child: ContinueButton(
-                    onPressed: () => provider.setCurrentStep(1),
-                    isLoading: false,
-                    text: 'Back',
-                    textColor: Colors.black54,
-                    backgroundColor: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ContinueButton(
-                    onPressed:
-                        _allDocumentsComplete(provider)
-                            ? () => _submitDocuments(provider, context)
-                            : () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Please complete all documents',
-                                  ),
-                                ),
-                              );
-                            },
-                    isLoading: false,
-                    text: 'Submit',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('${widget.title} saved successfully'),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.green,
         ),
-      ),
-    );
-  }
-
-  bool _allDocumentsComplete(RegistrationProvider provider) {
-    return provider.areAllDocumentsComplete([
-      'driving_license',
-      'latra_sticker',
-      'vehicle_registration',
-      'plate_number',
-    ]);
-  }
-
-  void _submitDocuments(RegistrationProvider provider, BuildContext context) {
-    try {
-      provider.completeRegistration();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const DriverDashboard()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Submission failed: $e')));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Failed to save document: $e'),
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 }

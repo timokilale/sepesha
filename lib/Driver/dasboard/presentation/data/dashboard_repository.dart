@@ -1,13 +1,13 @@
-import 'package:sepesha_app/Driver/model/ride_model.dart';
-import 'package:sepesha_app/Driver/model/user_model.dart';
+import '../../../model/ride_model.dart' show Ride, RideStatus;
+import '../../../model/user_model.dart' show User;
 
 class DashboardRepository {
-  Future<Driver> getDriverData() async {
+  Future<User> getUserData() async {
     await Future.delayed(const Duration(seconds: 1));
-    return Driver(
-      id: 'driver123',
-      name: 'John Driver',
-      email: 'john.driver@example.com',
+    return User(
+      id: 'User123',
+      name: 'John User',
+      email: 'john.User@example.com',
       phone: '+1234567890',
       vehicleNumber: 'ABC123',
       vehicleType: 'Sedan',

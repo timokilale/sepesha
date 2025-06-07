@@ -259,11 +259,7 @@ class RideSelectionContent extends StatelessWidget {
     );
   }
 
-  // 'assets/images/bodaboda.png'
-  // 'assets/images/bajaji.png'
-  // 'assets/images/guta.png'
-  // 'assets/images/carry.png'
-  // 'assets/images/townace.png'
+
 
   String _getVehicleImage(String name) {
     switch (name.toLowerCase().trim()) {

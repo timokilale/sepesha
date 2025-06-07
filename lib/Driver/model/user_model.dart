@@ -1,4 +1,4 @@
-class Driver {
+class User {
   final String id;
   final String name;
   final String email;
@@ -9,7 +9,7 @@ class Driver {
   final double rating;
   final int totalRides;
 
-  Driver({
+  User({
     required this.id,
     required this.name,
     required this.email,

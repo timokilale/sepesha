@@ -19,11 +19,9 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
 
   String? _selectedYear;
   String? _manufacturer;
-  String? _model;
+  String? _model;  String? _vehicleType;
   String? _color;
   File? _frontImage;
-  File? _leftImage;
-  File? _rightImage;
   File? _backImage;
 
   @override
@@ -99,6 +97,15 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                               ? 'Plate number is required'
                               : null,
                 ),
+
+                const SizedBox(height: 16),
+
+                _buildDropdown(
+                  label: 'Vehicle type',
+                  value: _vehicleType,
+                  items: const ['BodaBoda', 'Bajaji', 'Guta', 'Carry', 'Townice'],
+                  onChanged: (value) => setState(() => _vehicleType = value),
+                ),
                 const SizedBox(height: 24),
 
                 const Text(
@@ -116,13 +123,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.8,
+                Column(
                   children: [
                     _buildImageUpload(
                       label: 'Front',
@@ -136,21 +137,43 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                       onImageSelected:
                           (file) => setState(() => _backImage = file),
                     ),
-                    _buildImageUpload(
-                      label: 'Left Side',
-                      image: _leftImage,
-                      onImageSelected:
-                          (file) => setState(() => _leftImage = file),
-                    ),
-                    _buildImageUpload(
-                      label: 'Right Side',
-                      image: _rightImage,
-                      onImageSelected:
-                          (file) => setState(() => _rightImage = file),
-                    ),
                   ],
                 ),
 
+                // GridView.count(
+                //   crossAxisCount: 1,
+                //   shrinkWrap: true,
+                //   physics: const NeverScrollableScrollPhysics(),
+                //   // crossAxisSpacing: 16,
+                //   // mainAxisSpacing: 16,
+                //   childAspectRatio: 0.8,
+                //   children: [
+                //     _buildImageUpload(
+                //       label: 'Front',
+                //       image: _frontImage,
+                //       onImageSelected:
+                //           (file) => setState(() => _frontImage = file),
+                //     ),
+                //     _buildImageUpload(
+                //       label: 'Back',
+                //       image: _backImage,
+                //       onImageSelected:
+                //           (file) => setState(() => _backImage = file),
+                //     ),
+                // _buildImageUpload(
+                //   label: 'Left Side',
+                //   image: _leftImage,
+                //   onImageSelected:
+                //       (file) => setState(() => _leftImage = file),
+                // ),
+                // _buildImageUpload(
+                //   label: 'Right Side',
+                //   image: _rightImage,
+                //   onImageSelected:
+                //       (file) => setState(() => _rightImage = file),
+                // ),
+                //   ],
+                // ),
                 const SizedBox(height: 32),
 
                 Row(
@@ -312,7 +335,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
       'Year: $_selectedYear, Manufacturer: $_manufacturer, Model: $_model, Color: $_color',
     );
     debugPrint(
-      'Plate: ${_plateNumberController.text}, Images: ${_frontImage != null}, ${_backImage != null}, ${_leftImage != null}, ${_rightImage != null}',
+      'Plate: ${_plateNumberController.text}, Images: ${_frontImage != null}, ${_backImage != null}',
     );
 
     // return isValid;
@@ -325,9 +348,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
         _model == null ||
         _color == null ||
         _frontImage == null ||
-        _backImage == null ||
-        _leftImage == null ||
-        _rightImage == null) {
+        _backImage == null ) {
       debugPrint('Submit attempted with null values');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please complete all required fields')),
@@ -343,8 +364,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
       plateNumber: _plateNumberController.text,
       frontImage: _frontImage!,
       backImage: _backImage!,
-      leftImage: _leftImage!,
-      rightImage: _rightImage!,
+
     );
 
     debugPrint('Submitting vehicle: ${vehicle.toString()}');
