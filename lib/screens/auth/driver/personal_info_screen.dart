@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sepesha_app/Utilities/app_color.dart' show AppColor;
 import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/models/driver_model.dart';
+import 'package:sepesha_app/models/user_data.dart';
 import 'package:sepesha_app/provider/registration_provider.dart';
 import 'package:sepesha_app/screens/auth/driver/widgets/image_upload_widget.dart';
 import 'package:sepesha_app/services/session_manager.dart';
@@ -294,14 +295,14 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
       _photoMission = false;
 
-      final driver = Driver(
+      final driver = UserData(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         email: _emailController.text,
-        phone: _phoneController.text,
-        city: _selectedCity ?? '',
+        phoneNumber: _phoneController.text,
+    regionId:  1,// int.parse(_selectedCity!)  ,
         password: _passwordController.text,
-        profileImage: _profileImage,
+        profilePhoto: _profileImage,
         userType: 'driver',
       );
 
@@ -309,7 +310,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
       print('${SessionManager.instance.user.toString()}');
 
-      provider.updateDriver(driver);
       provider.setCurrentStep(1);
     }
   }

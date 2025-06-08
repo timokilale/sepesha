@@ -95,6 +95,117 @@ class AuthServices {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+  static Future<dynamic> registerDriver({
+    required BuildContext context,
+    required String firstName,
+    String? middleName,
+    required String lastName,
+    required String email,
+    required String phone,
+    required String phoneCode,
+    required int regionId,
+    required String userType,
+    required String password,
+    required String passwordConfirmation,
+    required bool privacyChecked,
+    required String licenceNumber,
+    required String licenceExpiry,
+    required File profilePhoto,
+    required File attachment,
+  }) async {
+    final uri = Uri.parse('$apiBaseUrl/register');
+    final request = http.MultipartRequest('POST', uri);
+
+    request.fields.addAll({
+      'first_name': firstName,
+      'middle_name': middleName ?? '',
+      'last_name': lastName,
+      'email': email,
+      'phone': phone,
+      'phonecode': phoneCode,
+      'region_id': regionId.toString(),
+      'user_type': userType,
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+      'privacy_checked': '1',
+      'referal_code': '',
+      'licence_number': licenceNumber,
+      'licence_expiry': licenceExpiry ?? '',
+
+    });
+
+    if (profilePhoto != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'profile_photo',
+          profilePhoto.path,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
+    }
+
+    if (attachment != null) {
+      final mimeType = lookupMimeType(attachment.path)?.split('/');
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'attachment',
+          attachment.path,
+          contentType: mimeType != null
+              ? MediaType(mimeType[0], mimeType[1])
+              : MediaType('application', 'octet-stream'),
+        ),
+      );
+    }
+
+    final response = await request.send();
+
+    if (response.statusCode == 201) {
+      final respStr = await response.stream.bytesToString();
+      final data = jsonDecode(respStr);
+      return data;
+    } else {
+      final respStr = await response.stream.bytesToString();
+      print('Error: ${response.statusCode}, $respStr');
+      final json = jsonDecode(respStr);
+      final message = json['message'];
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+      throw message;
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   static Future<dynamic> registerVendor({
     required BuildContext context,
     required String firstName,

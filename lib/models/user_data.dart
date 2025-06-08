@@ -104,11 +104,6 @@ class UserData {
   final String? middleName;
   final String? referralCode;
   final File? profilePhoto;
-  final String? drivingLicence;
-  final String? latraSticker;
-  final String? registrationCard;
-  final String? plateNumber;
-  final String? licenceExpiry;
   final String? businessDescription;
   final String? businessName;
   final String? businessType;
@@ -124,11 +119,6 @@ class UserData {
     this.middleName,
     this.referralCode,
     this.profilePhoto,
-    this.drivingLicence,
-    this.latraSticker,
-    this.registrationCard,
-    this.plateNumber,
-    this.licenceExpiry,
     this.businessDescription,
     this.businessName,
     this.businessType
@@ -149,11 +139,11 @@ class UserData {
       'privacy_checked': '1',
       if (middleName != null) 'middle_name': middleName,
       if (referralCode != null) 'referal_code': referralCode,
-      if (drivingLicence != null) 'driving_licence': drivingLicence,
-      if (latraSticker != null) 'latra_sticker': latraSticker,
-      if (registrationCard != null) 'registration_card': registrationCard,
-      if (plateNumber != null) 'plate_number': plateNumber,
-      if (licenceExpiry != null) 'licence_expiry': licenceExpiry,
+      // if (drivingLicence != null) 'driving_licence': drivingLicence,
+      // if (latraSticker != null) 'latra_sticker': latraSticker,
+      // if (registrationCard != null) 'registration_card': registrationCard,
+      // if (plateNumber != null) 'plate_number': plateNumber,
+      // if (licenceExpiry != null) 'licence_expiry': licenceExpiry,
       if (businessDescription != null)
         'business_description': businessDescription,
     };
@@ -179,11 +169,11 @@ class UserData {
       regionId: json['region_id'] as int,
       middleName: json['middle_name'] as String?,
       referralCode: json['referral_code'] as String?,
-      drivingLicence: json['driving_licence'] as String?,
-      latraSticker: json['latra_sticker'] as String?,
-      registrationCard: json['registration_card'] as String?,
-      plateNumber: json['plate_number'] as String?,
-      licenceExpiry: json['licence_expiry'] as String?,
+      // drivingLicence: json['driving_licence'] as String?,
+      // latraSticker: json['latra_sticker'] as String?,
+      // registrationCard: json['registration_card'] as String?,
+      // plateNumber: json['plate_number'] as String?,
+      // licenceExpiry: json['licence_expiry'] as String?,
       businessDescription: json['business_description'] as String?,
     );
   }
@@ -218,11 +208,11 @@ class UserData {
       middleName: middleName ?? this.middleName,
       referralCode: referralCode ?? this.referralCode,
       profilePhoto: profilePhoto ?? this.profilePhoto,
-      drivingLicence: drivingLicence ?? this.drivingLicence,
-      latraSticker: latraSticker ?? this.latraSticker,
-      registrationCard: registrationCard ?? this.registrationCard,
-      plateNumber: plateNumber ?? this.plateNumber,
-      licenceExpiry: licenceExpiry ?? this.licenceExpiry,
+      // drivingLicence: drivingLicence ?? this.drivingLicence,
+      // latraSticker: latraSticker ?? this.latraSticker,
+      // registrationCard: registrationCard ?? this.registrationCard,
+      // plateNumber: plateNumber ?? this.plateNumber,
+      // licenceExpiry: licenceExpiry ?? this.licenceExpiry,
       businessDescription: businessDescription ?? this.businessDescription,
     );
   }

@@ -1,6 +1,8 @@
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:sepesha_app/models/driver_document_model.dart';
-import 'package:sepesha_app/models/driver_model.dart';
+import 'package:archive/archive.dart';
 import 'package:sepesha_app/models/user_data.dart';
 import 'package:sepesha_app/models/vehicle_model.dart';
 import 'package:sepesha_app/screens/auth/otp_screen.dart';
@@ -9,7 +11,7 @@ import 'package:sepesha_app/services/session_manager.dart';
 
 class RegistrationProvider with ChangeNotifier {
   int _currentStep = 0;
-  Driver _driver = Driver();
+  UserData? _driver;
   Vehicle _vehicle = Vehicle();
   Map<String, dynamic> _documents = {};
   Map<String, bool> _documentCompletionStatus = {};
@@ -17,7 +19,7 @@ class RegistrationProvider with ChangeNotifier {
   bool _isLoading = false;
 
   int get currentStep => _currentStep;
-  Driver get driver => _driver;
+  UserData? get driver => _driver;
   Vehicle get vehicle => _vehicle;
   Map<String, dynamic> get documents => _documents;
   List<DriverDocumentModel> get completedDocuments => _completedDocuments;
@@ -60,7 +62,115 @@ class RegistrationProvider with ChangeNotifier {
 
 
 
+  Future<void> registerDriver(UserData user, Vehicle vehicle, List<DriverDocumentModel> driverDocuments, BuildContext context) async {
+    _setLoading(true);
+    print('User: $user');
 
+    try {
+      SessionManager.instance.setPhone(int.tryParse(user.phoneNumber)!);
+
+      // Ensure profilePhoto is not null
+      if (user.profilePhoto == null) {
+        throw Exception("Profile photo is required");
+      }
+
+      // Create a File from the profilePhoto
+      final profilePhoto = user.profilePhoto!;
+
+      // Create a zip file from documents if any exist
+      File? documentsZipFile;
+      if (driverDocuments.isNotEmpty && driverDocuments.any((doc) => doc.document != null)) {
+        documentsZipFile = await _createDocumentsZip(driverDocuments);
+      } else {
+        // Create an empty zip file if no documents are available
+        final tempDir = await getTemporaryDirectory();
+        final emptyZipFile = File('${tempDir.path}/empty_documents_${DateTime.now().millisecondsSinceEpoch}.zip');
+        final archive = Archive();
+        final zipData = ZipEncoder().encode(archive);
+        if (zipData == null) {
+          throw Exception('Failed to create empty zip file');
+        }
+        await emptyZipFile.writeAsBytes(zipData, flush: true);
+        documentsZipFile = emptyZipFile;
+      }
+
+      await AuthServices.registerDriver(
+        context: context,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        regionId: user.regionId,
+        email: user.email,
+        password: user.password,
+        userType: 'driver',
+        phone: user.phoneNumber,
+        privacyChecked: true,
+        passwordConfirmation: user.password,
+        middleName: user.middleName,
+        phoneCode: '255',
+        profilePhoto: profilePhoto,
+        licenceExpiry: '123',
+        licenceNumber: '123',
+        attachment: documentsZipFile
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => OTPScreen()),
+      );
+    } catch (e) {
+      _setLoading(false);
+      print('Error registering driver: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to register: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<File> _createDocumentsZip(List<DriverDocumentModel> documents) async {
+    final archive = Archive();
+
+    // Add all valid documents to the archive
+    for (final doc in documents) {
+      if (doc.document != null) {
+        try {
+          final file = doc.document!;
+          final fileData = await file.readAsBytes();
+          final fileName = '${doc.key}_${DateTime.now().millisecondsSinceEpoch}${_getFileExtension(file.path)}';
+
+          archive.addFile(ArchiveFile(
+            fileName,
+            fileData.length,
+            fileData,
+          ));
+        } catch (e) {
+          print('Error adding document ${doc.key} to zip: $e');
+        }
+      }
+    }
+
+    // Check if we actually added any files
+    if (archive.files.isEmpty) {
+      throw Exception('No valid documents found to include in zip');
+    }
+
+    // Create the zip file in temporary directory
+    final tempDir = await getTemporaryDirectory();
+    final zipFile = File('${tempDir.path}/documents_${DateTime.now().millisecondsSinceEpoch}.zip');
+
+    // Encode and write the zip file
+    final zipData = ZipEncoder().encode(archive);
+    if (zipData == null) {
+      throw Exception('Failed to encode zip file');
+    }
+
+    await zipFile.writeAsBytes(zipData, flush: true);
+    return zipFile;
+  }
+
+  String _getFileExtension(String path) {
+    final extension = path.split('.').last;
+    return extension == path ? '' : '.$extension'; // Handle cases where there's no extension
+  }
 
 
   Future<void> updateVendor(UserData user, BuildContext context) async {
@@ -106,7 +216,7 @@ class RegistrationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateDriver(Driver driver) {
+  void setDriver(UserData driver) {
     _driver = driver;
     SessionManager.instance.setUser(driver);
     notifyListeners();
@@ -160,15 +270,22 @@ class RegistrationProvider with ChangeNotifier {
   }
 
   bool isDocumentComplete(String key) {
-    // First check explicit completion status
+    // First check if document exists in SessionManager
     final documents = SessionManager.instance.documents;
-    if (documents.containsKey(key) && documents[key]['isComplete'] == true) {
-    if (_documentCompletionStatus.containsKey(key) ){
-    return _documentCompletionStatus[key]!;
+    if (documents.containsKey(key)) {
+      final doc = documents[key];
+      if (doc is Map && doc['isComplete'] == true) {
+        return true;
+      }
+    }
+
+    // Then check explicit completion status in provider
+    if (_documentCompletionStatus.containsKey(key)) {
+      return _documentCompletionStatus[key]!;
     }
 
     // Then check if document exists with all required fields
-    if (!_documents.containsKey(key) ){
+    if (!_documents.containsKey(key)) {
       return false;
     }
 
@@ -196,14 +313,24 @@ class RegistrationProvider with ChangeNotifier {
 
     // Reset all data after completion
     _currentStep = 0;
-    _driver = Driver();
+    // Create a new UserData object with required fields
+    final newDriver = UserData(
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      email: "",
+      password: "",
+      userType: "driver",
+      regionId: 0
+    );
+    _driver = newDriver;
     _vehicle = Vehicle();
     _documents = {};
     _documentCompletionStatus = {};
     _completedDocuments = [];
 
     // Reset data in SessionManager
-    SessionManager.instance.setUser(_driver);
+    SessionManager.instance.setUser(newDriver);
     SessionManager.instance.setVehicle(_vehicle);
     SessionManager.instance.clearDocuments();
 

@@ -42,6 +42,9 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      _loadExistingData();
+    });
     _loadExistingData();
   }
 
@@ -79,7 +82,7 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isCompleted ? Colors.blue : Colors.grey,
+          color: isCompleted ? AppColor.primary : Colors.grey,
           width: 1,
         ),
       ),
@@ -92,7 +95,7 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
             children: [
               Icon(
                 Icons.description_outlined,
-                color: isCompleted ? Colors.blue : Colors.grey,
+                color: isCompleted ? AppColor.primary : Colors.grey,
                 size: 28,
               ),
               const SizedBox(width: 16),
@@ -107,7 +110,7 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
                 ),
               ),
               if (isCompleted)
-                const Icon(Icons.check_circle, color: Colors.blue, size: 24),
+                const Icon(Icons.check_circle, color: Colors.green, size: 24),
             ],
           ),
         ),
@@ -224,6 +227,7 @@ class _DocumentCardWidgetState extends State<DocumentCardWidget> {
                           }
 
                           _completeDocument(context);
+
                         }
                       },
                       isLoading: false,

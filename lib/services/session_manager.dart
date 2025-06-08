@@ -1,3 +1,5 @@
+import 'package:sepesha_app/models/user_data.dart';
+
 import '../Driver/model/user_model.dart';
 import '../models/driver_model.dart';
 import '../models/driver_document_model.dart';
@@ -14,7 +16,7 @@ class SessionManager {
   String? _middlename;
   String? _email;
   String? _distanceCovered;
-  Driver? _user;
+  UserData? _user;
   Vehicle? _vehicle;
   Map<String, dynamic> _documents = {};
   Map<String, bool> _documentCompletionStatus = {};
@@ -23,11 +25,11 @@ class SessionManager {
 
 
 
-  void setUser(Driver user) {
+  void setUser(UserData user) {
     _user = user;
   }
 
-  Driver? get user {
+  UserData? get user {
     if (_user == null) throw Exception("user is NULL");
     return _user;
   }

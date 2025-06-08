@@ -5,12 +5,14 @@ class DriverDocumentModel {
   final String? document_id;
   final String? expire_date;
   final File? document;
+  final bool isComplete;
 
   DriverDocumentModel({
     required this.key,
     this.document_id,
     this.expire_date,
     this.document,
+    this.isComplete = true,
   });
 
   Map<String, dynamic> toJson() {
