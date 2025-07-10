@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sepesha_app/provider/registration_provider.dart';
 import 'package:sepesha_app/screens/auth/business_documents_screen.dart';
-import 'package:sepesha_app/screens/auth/driver/document_upload_screen.dart';
 import 'package:sepesha_app/screens/auth/driver/personal_info_screen.dart';
-import 'package:sepesha_app/screens/auth/driver/vehicle_info_screen.dart';
-import 'package:sepesha_app/screens/auth/driver/widgets/registration_stepper_widget.dart';
 import 'package:sepesha_app/screens/auth/vendor_stepper_widget.dart';
 
 class VendorStepperScreen extends StatefulWidget {

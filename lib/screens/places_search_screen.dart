@@ -67,16 +67,16 @@ class _PlacesSearchScreenState extends State<PlacesSearchScreen> {
       return;
     }
     if (responseApi["status"] == "OK") {
-      DirectionModel _directionModel = DirectionModel();
-      _directionModel.locationName = responseApi["result"]["name"];
-      _directionModel.locationId = placeId;
-      _directionModel.locationLatitude =
+      DirectionModel directionModel = DirectionModel();
+      directionModel.locationName = responseApi["result"]["name"];
+      directionModel.locationId = placeId;
+      directionModel.locationLatitude =
           responseApi["result"]["geometry"]["location"]["lat"];
-      _directionModel.locationLongitude =
+      directionModel.locationLongitude =
           responseApi["result"]["geometry"]["location"]["lng"];
 
       setState(() {
-        UserdropOffAddress = _directionModel.locationName!;
+        UserdropOffAddress = directionModel.locationName!;
       });
     }
   }

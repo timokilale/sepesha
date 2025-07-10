@@ -7,7 +7,7 @@ import 'package:sepesha_app/provider/ride_provider.dart';
 class TripInProgressContent extends StatelessWidget {
   final RideProvider provider;
 
-  const TripInProgressContent({required this.provider});
+  const TripInProgressContent({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {

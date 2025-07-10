@@ -3,7 +3,7 @@ import 'package:sepesha_app/Utilities/app_color.dart';
 
 /// A handle widget for draggable bottom sheets
 class SheetHandle extends StatelessWidget {
-  const SheetHandle({Key? key}) : super(key: key);
+  const SheetHandle({super.key});
 
   @override
   Widget build(BuildContext context) {

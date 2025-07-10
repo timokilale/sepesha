@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sepesha_app/Driver/model/ride_model.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
-import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/helper/helper.dart';
 

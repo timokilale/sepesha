@@ -8,7 +8,7 @@ import 'package:sepesha_app/services/session_manager.dart';
 
 class OTPProvider with ChangeNotifier {
   int _resendTimer = 30;
-  List<TextEditingController> _otpControllers = List.generate(
+  final List<TextEditingController> _otpControllers = List.generate(
     4,
     (_) => TextEditingController(),
   );

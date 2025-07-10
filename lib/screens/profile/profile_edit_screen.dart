@@ -9,7 +9,7 @@ import 'package:sepesha_app/services/session_manager.dart';
 import 'package:sepesha_app/screens/auth/driver/widgets/image_upload_widget.dart';
 
 class ProfileEditScreen extends StatefulWidget {
-  const ProfileEditScreen({Key? key}) : super(key: key);
+  const ProfileEditScreen({super.key});
 
   @override
   State<ProfileEditScreen> createState() => _ProfileEditScreenState();
@@ -161,8 +161,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value?.isEmpty ?? true) return 'Phone number is required';
-                  if (value!.length < 9)
+                  if (value!.length < 9) {
                     return 'Phone number must be at least 9 digits';
+                  }
                   return null;
                 },
               ),

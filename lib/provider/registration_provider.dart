@@ -87,9 +87,6 @@ class RegistrationProvider with ChangeNotifier {
         final emptyZipFile = File('${tempDir.path}/empty_documents_${DateTime.now().millisecondsSinceEpoch}.zip');
         final archive = Archive();
         final zipData = ZipEncoder().encode(archive);
-        if (zipData == null) {
-          throw Exception('Failed to create empty zip file');
-        }
         await emptyZipFile.writeAsBytes(zipData, flush: true);
         documentsZipFile = emptyZipFile;
       }
@@ -159,9 +156,6 @@ class RegistrationProvider with ChangeNotifier {
 
     // Encode and write the zip file
     final zipData = ZipEncoder().encode(archive);
-    if (zipData == null) {
-      throw Exception('Failed to encode zip file');
-    }
 
     await zipFile.writeAsBytes(zipData, flush: true);
     return zipFile;
@@ -180,7 +174,7 @@ class RegistrationProvider with ChangeNotifier {
     try {
       SessionManager.instance.setPhone(int.parse(user.phoneNumber));
 
-      final _businessDescription = "${user.businessName}\n${user.businessType}\n${user.businessDescription}";
+      final businessDescription = "${user.businessName}\n${user.businessType}\n${user.businessDescription}";
       await AuthServices.registerVendor(
 
           context: context,
@@ -196,7 +190,7 @@ class RegistrationProvider with ChangeNotifier {
           middleName: user.middleName,
           phoneCode: '255',
           profilePhoto: user.profilePhoto,
-          businessDescription: _businessDescription
+          businessDescription: businessDescription
 
 
       );

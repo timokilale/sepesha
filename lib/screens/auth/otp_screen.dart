@@ -8,7 +8,7 @@ import 'package:sepesha_app/provider/otp_provider.dart';
 import 'package:sepesha_app/services/session_manager.dart';
 
 class OTPScreen extends StatelessWidget {
-  OTPScreen({super.key});
+  const OTPScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

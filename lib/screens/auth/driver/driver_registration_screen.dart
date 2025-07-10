@@ -11,6 +11,8 @@ import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/components/app_button.dart';
 
 class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
+
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
@@ -281,8 +283,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   label: 'Confirm Password',
                   obscureText: true,
                   validator: (value) {
-                    if (value != _passwordController.text)
+                    if (value != _passwordController.text) {
                       return 'Passwords do not match';
+                    }
                     return null;
                   },
                 ),
@@ -778,10 +781,10 @@ class _VehicleDetailsState extends State<VehicleDetails> {
                     _submitForm();
                   }
                 },
-                child: Text('Submit Vehicle Details'),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
                 ),
+                child: Text('Submit Vehicle Details'),
               ),
             ),
           ],
@@ -1314,11 +1317,13 @@ class _IdentityDocumentsScreenState extends State<IdentityDocumentsScreen> {
   bool _isDocumentComplete(DocumentData document) {
     if (document.file == null) return false;
     if (document.requiresIdNumber &&
-        (document.idNumberController?.text.isEmpty ?? true))
+        (document.idNumberController?.text.isEmpty ?? true)) {
       return false;
+    }
     if (document.requiresExpiryDate &&
-        (document.expireDateController?.text.isEmpty ?? true))
+        (document.expireDateController?.text.isEmpty ?? true)) {
       return false;
+    }
     return true;
   }
 

@@ -7,7 +7,7 @@ import 'package:sepesha_app/provider/ride_provider.dart';
 class SearchingContent extends StatelessWidget {
   final RideProvider provider;
 
-  const SearchingContent({required this.provider});
+  const SearchingContent({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {

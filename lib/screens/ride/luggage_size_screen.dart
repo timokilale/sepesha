@@ -5,7 +5,7 @@ import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/screens/ride/ride_confirmation_screen.dart';
 
 class LuggageSizeScreen extends StatefulWidget {
-  const LuggageSizeScreen({Key? key}) : super(key: key);
+  const LuggageSizeScreen({super.key});
 
   @override
   _LuggageSizeScreenState createState() => _LuggageSizeScreenState();
@@ -13,8 +13,8 @@ class LuggageSizeScreen extends StatefulWidget {
 
 class _LuggageSizeScreenState extends State<LuggageSizeScreen> {
   String _selectedSize = 'International carry on';
-  double _additionalCost = 5.15;
-  double _rideAmount = 10.99;
+  final double _additionalCost = 5.15;
+  final double _rideAmount = 10.99;
   bool _proofTaken = false;
 
   @override

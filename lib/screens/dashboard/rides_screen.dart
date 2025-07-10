@@ -7,6 +7,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,6 +24,8 @@ class MyApp extends StatelessWidget {
 }
 
 class RidesScreen extends StatelessWidget {
+  const RidesScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,7 +193,7 @@ class ActiveRideCard extends StatelessWidget {
   final String carModel;
   final String plateNumber;
 
-  ActiveRideCard({
+  const ActiveRideCard({super.key, 
     required this.driverName,
     required this.arrivalTime,
     required this.cost,
@@ -415,7 +419,6 @@ class ActiveRideCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {},
-                    child: Text('Contact Driver'),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: Colors.red),
                       padding: EdgeInsets.symmetric(vertical: 12),
@@ -423,19 +426,20 @@ class ActiveRideCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
+                    child: Text('Contact Driver'),
                   ),
                 ),
                 SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {},
-                    child: Text('Cancel Ride'),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
+                    child: Text('Cancel Ride'),
                   ),
                 ),
               ],
@@ -469,7 +473,7 @@ class CompletedRideCard extends StatelessWidget {
   final double rating;
   final String carModel;
 
-  CompletedRideCard({
+  const CompletedRideCard({super.key, 
     required this.driverName,
     required this.phone,
     required this.cost,
@@ -627,13 +631,13 @@ class CompletedRideCard extends StatelessWidget {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {},
-              child: Text('Rate This Ride'),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
+              child: Text('Rate This Ride'),
             ),
           ],
         ),
@@ -664,7 +668,7 @@ class CanceledRideCard extends StatelessWidget {
   final double rating;
   final String carModel;
 
-  CanceledRideCard({
+  const CanceledRideCard({super.key, 
     required this.driverName,
     required this.phone,
     required this.cost,
@@ -826,13 +830,13 @@ class CanceledRideCard extends StatelessWidget {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {},
-              child: Text('Book Again'),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
+              child: Text('Book Again'),
             ),
           ],
         ),

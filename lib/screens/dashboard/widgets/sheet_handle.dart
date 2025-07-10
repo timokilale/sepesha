@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SheetHandle extends StatelessWidget {
-  const SheetHandle();
+  const SheetHandle({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -7,7 +7,7 @@ class DraggableSheet extends StatelessWidget {
   final Widget child;
   final bool fitToContent;
 
-  const DraggableSheet({
+  const DraggableSheet({super.key, 
     required this.initialChildSize,
     required this.minChildSize,
     required this.maxChildSize,

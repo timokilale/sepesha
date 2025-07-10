@@ -259,8 +259,9 @@ class _VendorRegistrationScreenState extends State<VendorRegistrationScreen> {
                   });
                 },
                 validator: (value) {
-                  if (value != _passwordController.text)
+                  if (value != _passwordController.text) {
                     return 'Passwords do not match';
+                  }
                   return null;
                 },
               ),

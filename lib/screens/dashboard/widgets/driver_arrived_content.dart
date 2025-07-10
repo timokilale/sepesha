@@ -8,7 +8,7 @@ import 'package:sepesha_app/provider/ride_provider.dart';
 class DriverArrivedContent extends StatelessWidget {
   final RideProvider provider;
 
-  const DriverArrivedContent({required this.provider});
+  const DriverArrivedContent({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {

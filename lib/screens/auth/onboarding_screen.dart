@@ -99,7 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   Text.rich(
                     TextSpan(
-                      text: onboardingPages[currentIndex]['title']! + " ",
+                      text: "${onboardingPages[currentIndex]['title']!} ",
                       style: AppTextStyle.paragraph5(AppColor.blackText),
                       children: [
                         TextSpan(

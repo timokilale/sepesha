@@ -30,20 +30,20 @@ class RideProvider with ChangeNotifier {
   String _pickupAddress = 'Current location';
   String _destinationAddress = 'Where to?';
   String _distanceCovered = ''; // Added to store distance
-  bool _isLocationLoading = true;
+  final bool _isLocationLoading = true;
   bool _isLoading = false;
-  bool _showRideResults = false;
-  bool _hideLocationCard = false;
+  final bool _showRideResults = false;
+  final bool _hideLocationCard = false;
   List<LatLng> _polylineCoordinates = []; // Added for polyline storage
 
   // Map controller
-  Completer<GoogleMapController> _mapController = Completer();
+  final Completer<GoogleMapController> _mapController = Completer();
 
   // Ride details
-  String _driverName = 'John D.';
-  String _driverRating = '4.9 (256 rides)';
-  String _carDetails = 'Toyota Prius • Green • ABC-1234';
-  String _paymentMethod = 'Cash';
+  final String _driverName = 'John D.';
+  final String _driverRating = '4.9 (256 rides)';
+  final String _carDetails = 'Toyota Prius • Green • ABC-1234';
+  final String _paymentMethod = 'Cash';
 
   // Filter related
   String _filterType = '4 Wheeler';

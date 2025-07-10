@@ -9,7 +9,7 @@ import 'package:sepesha_app/screens/dashboard/widgets/driver_info_tile.dart';
 class DriverAssignedContent extends StatelessWidget {
   final RideProvider provider;
 
-  const DriverAssignedContent({required this.provider});
+  const DriverAssignedContent({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {

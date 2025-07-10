@@ -9,7 +9,7 @@ import 'package:sepesha_app/services/session_manager.dart';
 class RideSelectionContent extends StatelessWidget {
   final RideProvider provider;
 
-  RideSelectionContent({required this.provider});
+  RideSelectionContent({super.key, required this.provider});
 
   // Add separate lists for 2 Wheeler and 4 Wheeler using the correct RideOption constructor (positional arguments)
 

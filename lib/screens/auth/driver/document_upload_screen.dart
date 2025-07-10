@@ -9,7 +9,7 @@ import 'package:sepesha_app/screens/auth/driver/widgets/document_card_widget.dar
 import 'package:sepesha_app/services/session_manager.dart';
 
 class DocumentUploadScreen extends StatefulWidget {
-  DocumentUploadScreen({super.key});
+  const DocumentUploadScreen({super.key});
 
   @override
   State<DocumentUploadScreen> createState() => _DocumentUploadScreenState();

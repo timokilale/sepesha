@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:sepesha_app/screens/dashboard/account_screen.dart';
 import 'package:sepesha_app/screens/dashboard/home_screen.dart';
 import 'package:sepesha_app/screens/dashboard/rides_screen.dart';

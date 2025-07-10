@@ -10,7 +10,7 @@ import 'package:sepesha_app/screens/dashboard/widgets/trip_in_progress.dart';
 class StateSpecificSheet extends StatelessWidget {
   final RideProvider provider;
 
-  const StateSpecificSheet({required this.provider});
+  const StateSpecificSheet({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {

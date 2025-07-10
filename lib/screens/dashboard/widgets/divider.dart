@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sepesha_app/screens/dashboard/widgets/dotted-line_painter.dart';
 
 class Divider extends StatelessWidget {
-  const Divider();
+  const Divider({super.key});
 
   @override
   Widget build(BuildContext context) {

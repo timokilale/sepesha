@@ -12,7 +12,7 @@ import 'package:sepesha_app/screens/info_handler/app_info.dart';
 import 'package:sepesha_app/services/request_assistance.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -35,9 +35,9 @@ class _MainScreenState extends State<MainScreen> {
   double bottomPaddingOfMap = 0;
 
   List<LatLng> polylineCoordinates = [];
-  Set<Polyline> _polylines = {};
-  Set<Marker> _markers = {};
-  Set<Circle> _circles = {};
+  final Set<Polyline> _polylines = {};
+  final Set<Marker> _markers = {};
+  final Set<Circle> _circles = {};
 
   List<PredictedPlaces> _pickupPredictedPlaces = [];
   List<PredictedPlaces> _dropoffPredictedPlaces = [];
@@ -45,8 +45,8 @@ class _MainScreenState extends State<MainScreen> {
   bool _showDropoffSuggestions = false;
   final TextEditingController _pickupController = TextEditingController();
   final TextEditingController _dropoffController = TextEditingController();
-  FocusNode _pickupFocusNode = FocusNode();
-  FocusNode _dropoffFocusNode = FocusNode();
+  final FocusNode _pickupFocusNode = FocusNode();
+  final FocusNode _dropoffFocusNode = FocusNode();
 
   @override
   void initState() {

@@ -3,7 +3,7 @@ import 'package:sepesha_app/Utilities/app_color.dart';
 
 /// A custom divider widget for separating content
 class CustomDivider extends StatelessWidget {
-  const CustomDivider({Key? key}) : super(key: key);
+  const CustomDivider({super.key});
 
   @override
   Widget build(BuildContext context) {

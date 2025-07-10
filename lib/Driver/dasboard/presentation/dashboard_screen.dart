@@ -4,13 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/dashboard_viewmodel.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/widgets/driver_status_toggle.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/widgets/ride_request_card.dart';
-import 'package:sepesha_app/Driver/dasboard/presentation/widgets/wallet_card.dart';
 import 'package:sepesha_app/Driver/history/presentation/history_screen.dart';
-import 'package:sepesha_app/Driver/live/presentation/live_screen.dart';
-import 'package:sepesha_app/Driver/live/presentation/widgets/live_status_card.dart';
 import 'package:sepesha_app/Driver/model/ride_model.dart';
 import 'package:sepesha_app/Driver/model/user_model.dart';
-import 'package:sepesha_app/Driver/wallet/presentation/wallet_screen.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/components/app_button.dart';
 

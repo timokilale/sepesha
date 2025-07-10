@@ -1,7 +1,5 @@
 import 'package:sepesha_app/models/user_data.dart';
 
-import '../Driver/model/user_model.dart';
-import '../models/driver_model.dart';
 import '../models/driver_document_model.dart';
 import 'package:sepesha_app/models/vehicle_model.dart';
 

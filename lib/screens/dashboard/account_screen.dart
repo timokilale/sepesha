@@ -106,7 +106,7 @@ class AccountScreen extends StatelessWidget {
   }
 
   Widget _buildProfileSection() {
-    SessionManager _userData = SessionManager.instance;
+    SessionManager userData = SessionManager.instance;
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -128,17 +128,17 @@ class AccountScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _userData.getFirstname,
+                    userData.getFirstname,
                     style: AppTextStyle.paragraph2(AppColor.blackText),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _userData.getEmail,
+                    userData.getEmail,
                     style: AppTextStyle.paragraph1(AppColor.grey),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '+255${_userData.phone}',
+                    '+255${userData.phone}',
                     style: AppTextStyle.paragraph1(AppColor.grey),
                   ),
                 ],

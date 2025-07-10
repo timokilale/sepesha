@@ -33,16 +33,16 @@ class AssistanceService {
           requestResponse['results'].isNotEmpty) {
         humanReadableAddress =
             requestResponse['results'][0]['formatted_address'];
-        DirectionModel _userPickupAddress = DirectionModel();
+        DirectionModel userPickupAddress = DirectionModel();
 
-        _userPickupAddress.locationName = humanReadableAddress;
-        _userPickupAddress.locationLatitude = position.latitude;
-        _userPickupAddress.locationLongitude = position.longitude;
+        userPickupAddress.locationName = humanReadableAddress;
+        userPickupAddress.locationLatitude = position.latitude;
+        userPickupAddress.locationLongitude = position.longitude;
 
         Provider.of<AppInfo>(
           context,
           listen: false,
-        ).updatePickupLocationAddress(_userPickupAddress);
+        ).updatePickupLocationAddress(userPickupAddress);
       }
     } catch (e) {
       debugPrint('Error parsing address: $e');

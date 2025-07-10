@@ -7,7 +7,7 @@ import 'package:sepesha_app/screens/dashboard/dashboard.dart';
 import 'dart:async';
 
 class DeliveryTrackingScreen extends StatefulWidget {
-  const DeliveryTrackingScreen({Key? key}) : super(key: key);
+  const DeliveryTrackingScreen({super.key});
 
   @override
   _DeliveryTrackingScreenState createState() => _DeliveryTrackingScreenState();

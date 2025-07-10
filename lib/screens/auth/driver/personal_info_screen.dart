@@ -180,8 +180,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   label: 'Confirm Password',
                   obscureText: true,
                   validator: (value) {
-                    if (value != _passwordController.text)
+                    if (value != _passwordController.text) {
                       return 'Passwords do not match';
+                    }
                     return null;
                   },
                 ),
@@ -308,7 +309,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
       SessionManager.instance.setUser(driver);
 
-      print('${SessionManager.instance.user.toString()}');
+      print(SessionManager.instance.user.toString());
 
       provider.setCurrentStep(1);
     }

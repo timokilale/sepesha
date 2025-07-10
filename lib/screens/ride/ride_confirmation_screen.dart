@@ -7,7 +7,7 @@ import 'package:sepesha_app/screens/ride/delivery_tracking_screen.dart';
 import 'dart:async';
 
 class RideConfirmationScreen extends StatefulWidget {
-  const RideConfirmationScreen({Key? key}) : super(key: key);
+  const RideConfirmationScreen({super.key});
 
   @override
   _RideConfirmationScreenState createState() => _RideConfirmationScreenState();

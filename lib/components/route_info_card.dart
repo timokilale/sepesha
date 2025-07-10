@@ -8,11 +8,11 @@ class RouteInfoCard extends StatelessWidget {
   final double topPosition;
 
   const RouteInfoCard({
-    Key? key,
+    super.key,
     required this.startLocation,
     required this.endLocation,
     this.topPosition = 50,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

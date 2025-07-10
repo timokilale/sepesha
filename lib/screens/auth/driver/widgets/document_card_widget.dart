@@ -2,11 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:sepesha_app/Driver/dasboard/driver_dashboard.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/components/app_button.dart';
-import 'package:sepesha_app/models/driver_document_model.dart';
 import 'package:sepesha_app/provider/registration_provider.dart';
 import 'package:sepesha_app/screens/auth/driver/widgets/image_upload_widget.dart';
 

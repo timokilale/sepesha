@@ -5,7 +5,7 @@ import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/screens/ride/luggage_size_screen.dart';
 
 class RideSelectionScreen extends StatefulWidget {
-  const RideSelectionScreen({Key? key}) : super(key: key);
+  const RideSelectionScreen({super.key});
 
   @override
   _RideSelectionScreenState createState() => _RideSelectionScreenState();

@@ -10,7 +10,7 @@ import 'package:sepesha_app/services/session_manager.dart';
 import 'package:sepesha_app/services/token_manager.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();

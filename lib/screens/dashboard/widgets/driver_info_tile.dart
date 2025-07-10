@@ -6,7 +6,7 @@ class DriverInfoTile extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const DriverInfoTile({
+  const DriverInfoTile({super.key, 
     required this.icon,
     required this.title,
     required this.subtitle,

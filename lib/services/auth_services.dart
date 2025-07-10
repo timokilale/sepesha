@@ -146,29 +146,25 @@ class AuthServices {
 
     });
 
-    if (profilePhoto != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'profile_photo',
-          profilePhoto.path,
-          contentType: MediaType('image', 'jpeg'),
-        ),
-      );
-    }
-
-    if (attachment != null) {
-      final mimeType = lookupMimeType(attachment.path)?.split('/');
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'attachment',
-          attachment.path,
-          contentType: mimeType != null
-              ? MediaType(mimeType[0], mimeType[1])
-              : MediaType('application', 'octet-stream'),
-        ),
-      );
-    }
-
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'profile_photo',
+        profilePhoto.path,
+        contentType: MediaType('image', 'jpeg'),
+      ),
+    );
+  
+    final mimeType = lookupMimeType(attachment.path)?.split('/');
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'attachment',
+        attachment.path,
+        contentType: mimeType != null
+            ? MediaType(mimeType[0], mimeType[1])
+            : MediaType('application', 'octet-stream'),
+      ),
+    );
+  
     final response = await request.send();
 
     if (response.statusCode == 201) {
