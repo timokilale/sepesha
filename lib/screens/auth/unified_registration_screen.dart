@@ -14,7 +14,8 @@ import 'package:sepesha_app/screens/auth/driver/widgets/image_upload_widget.dart
 import 'package:sepesha_app/Utilities/app_color.dart';
 
 class UnifiedRegistrationScreen extends StatefulWidget {
-  const UnifiedRegistrationScreen({super.key});
+  final String? userType;
+  const UnifiedRegistrationScreen({super.key, this.userType});
 
   @override
   State<UnifiedRegistrationScreen> createState() =>
@@ -57,7 +58,8 @@ class _UnifiedRegistrationScreenState extends State<UnifiedRegistrationScreen> {
   final TextEditingController _businessNameController = TextEditingController();
   final TextEditingController _businessAddressController =
       TextEditingController();
-  final TextEditingController _businessDescriptionController = TextEditingController();
+  final TextEditingController _businessDescriptionController =
+      TextEditingController();
   final TextEditingController _licenseNumberController =
       TextEditingController();
   final TextEditingController _licenseExpiryController =
@@ -79,7 +81,7 @@ class _UnifiedRegistrationScreenState extends State<UnifiedRegistrationScreen> {
   File? _backImage;
 
   String? _selectedRegion;
-  String _selectedUserType = 'customer';
+  String? _selectedUserType = 'customer';
   File? _profileImage;
   bool _privacyChecked = false;
   bool _obscurePassword = true;
@@ -120,6 +122,11 @@ class _UnifiedRegistrationScreenState extends State<UnifiedRegistrationScreen> {
       _confirmPasswordController.text = 'password123';
       _referralCodeController.text = 'REF123';
     }
+
+    setState(() {
+      _selectedUserType = widget.userType ?? 'customer';
+    });
+
     super.initState();
   }
 
@@ -163,10 +170,6 @@ class _UnifiedRegistrationScreenState extends State<UnifiedRegistrationScreen> {
                   color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 24),
-
-              // Role Selection Dropdown (at the top)
-              _buildRoleSelection(),
               const SizedBox(height: 24),
 
               // Driver Step Indicator
@@ -831,43 +834,6 @@ class _UnifiedRegistrationScreenState extends State<UnifiedRegistrationScreen> {
     );
   }
 
-  Widget _buildRoleSelection() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.primary, width: 2),
-        borderRadius: BorderRadius.circular(12),
-        color: AppColor.primary.withValues(alpha: 0.05),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: DropdownButtonFormField<String>(
-        value: _selectedUserType,
-        decoration: const InputDecoration(
-          labelText: 'I want to register as *',
-          labelStyle: TextStyle(fontWeight: FontWeight.bold),
-          prefixIcon: Icon(Icons.person_outline),
-          border: InputBorder.none,
-        ),
-        items: const [
-          DropdownMenuItem(value: 'customer', child: Text('Customer')),
-          DropdownMenuItem(value: 'driver', child: Text('Driver')),
-          DropdownMenuItem(value: 'vendor', child: Text('Vendor/Business')),
-        ],
-        onChanged: (String? newValue) {
-          setState(() {
-            _selectedUserType = newValue ?? 'customer';
-            _currentStep = 0; // Reset step when changing user type
-          });
-        },
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please select your role';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
   Widget _buildCommonFields() {
     return Column(
       children: [
@@ -1005,7 +971,11 @@ class _UnifiedRegistrationScreenState extends State<UnifiedRegistrationScreen> {
           label: 'Business Description *',
           prefixIcon: Icons.description,
           maxLines: 3,
-          validator: (value) => value?.isEmpty ?? true ? 'Business description is required' : null,
+          validator:
+              (value) =>
+                  value?.isEmpty ?? true
+                      ? 'Business description is required'
+                      : null,
         ),
         const SizedBox(height: 16),
         _buildTextField(
@@ -1256,10 +1226,14 @@ class _UnifiedRegistrationScreenState extends State<UnifiedRegistrationScreen> {
                 : _referralCodeController.text,
         password: _passwordController.text,
         profilePhoto: _profileImage,
-        userType: _selectedUserType,
+        userType: _selectedUserType ?? 'customer',
         // Add vendor-specific fields
-        businessName: _selectedUserType == 'vendor' ? _businessNameController.text : null,
-        businessDescription: _selectedUserType == 'vendor' ? _businessDescriptionController.text : null,
+        businessName:
+            _selectedUserType == 'vendor' ? _businessNameController.text : null,
+        businessDescription:
+            _selectedUserType == 'vendor'
+                ? _businessDescriptionController.text
+                : null,
       );
 
       if (_selectedUserType == 'driver') {

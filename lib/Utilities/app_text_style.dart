@@ -20,7 +20,7 @@ class AppTextStyle {
   static const double _heading2 = 32.0;
   static const double _heading3 = 36.0;
 
-  static const String _fontFamily = 'Montserrat';
+  static const String _fontFamily = 'Poppins';
 
   // Static text styles for common use cases
   static const TextStyle bodyTextStyle = TextStyle(

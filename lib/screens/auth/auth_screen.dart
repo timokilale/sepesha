@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
@@ -47,21 +49,43 @@ class _AuthScreenState extends State<AuthScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
-                Image.asset(
-                  AppImages.authImage,
-                  height: 180,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 32),
+
+                if (_selectedUserType == 'driver') ...[
+                  SvgPicture.asset(AppSvg.driverImage, width: 300, height: 300),
+                ] else if (_selectedUserType == 'customer') ...[
+                  SvgPicture.asset(
+                    AppSvg.customerImage,
+                    width: 300,
+                    height: 300,
+                  ),
+                ] else if (_selectedUserType == 'vendor') ...[
+                  Column(
+                    children: [
+                      Image.asset(
+                        AppImages.authImage,
+                        height: 180,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(height: 20),
+                    ],
+                  ),
+                ],
+
                 Text(
-                  'Enter your phone number',
+                  'Hello, $_selectedUserType!, Welcome back',
                   style: AppTextStyle.paragraph2(AppColor.lightBlack),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'We\'ll send you a verification code',
+                  'Enter your phone number We\'ll send you a verification code',
                   style: AppTextStyle.subtext4(AppColor.lightBlack),
+                  textAlign: TextAlign.center,
                 ),
+                // const SizedBox(height: 8),
+                // Text(
+                //   'Hello, $_selectedUserType!, Welcome back',
+                //   style: AppTextStyle.subtext4(AppColor.lightBlack),
+                // ),
                 const SizedBox(height: 32),
                 IntlPhoneField(
                   decoration: InputDecoration(
@@ -109,43 +133,118 @@ class _AuthScreenState extends State<AuthScreen> {
                     phoneNumber = phone.completeNumber;
                   },
                 ),
-                const SizedBox(height: 24),
 
-                // User Type Dropdown
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColor.primary, width: 2),
-                    borderRadius: BorderRadius.circular(12),
-                    color: AppColor.primary.withValues(alpha: 0.05),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedUserType,
-                    decoration: const InputDecoration(
-                      labelText: 'I am logging in as *',
-                      labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                      prefixIcon: Icon(Icons.person_outline),
-                      border: InputBorder.none,
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'customer',
-                        child: Text('Customer'),
+                InkWell(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      showDragHandle: true,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
                       ),
-                      DropdownMenuItem(value: 'driver', child: Text('Driver')),
-                      DropdownMenuItem(
-                        value: 'vendor',
-                        child: Text('Vendor/Business'),
-                      ),
-                    ],
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedUserType = newValue ?? 'customer';
-                      });
-                    },
+                      builder: (BuildContext context) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListTile(
+                                leading: HugeIcon(
+                                  icon: HugeIcons.strokeRoundedBriefcase01,
+                                  color: AppColor.primary,
+                                ),
+                                title: Text(
+                                  'Driver',
+                                  style: AppTextStyle.paragraph1(
+                                    AppColor.black,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Login as a driver for easy gain request from customers and vendors',
+                                  style: AppTextStyle.subtext4(
+                                    AppColor.blackSubtext,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _selectedUserType = 'driver';
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              Divider(),
+                              ListTile(
+                                leading: Icon(
+                                  Icons.storefront_outlined,
+                                  color: AppColor.primary,
+                                ),
+                                title: Text(
+                                  'Vendor/Business',
+                                  style: AppTextStyle.paragraph1(
+                                    AppColor.black,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Login as a vendor to manage your products and receive orders',
+                                  style: AppTextStyle.subtext4(
+                                    AppColor.blackSubtext,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _selectedUserType = 'vendor';
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              Divider(),
+                              ListTile(
+                                leading: Icon(
+                                  Icons.person_outline,
+                                  color: AppColor.primary,
+                                ),
+                                title: Text(
+                                  'Customer',
+                                  style: AppTextStyle.paragraph1(
+                                    AppColor.black,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Login as a customer to request deliveries and order products',
+                                  style: AppTextStyle.subtext4(
+                                    AppColor.blackSubtext,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _selectedUserType = 'customer';
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              SizedBox(height: 30),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Text(
+                    _selectedUserType == 'customer'
+                        ? 'Login as Driver or Vendor'
+                        : _selectedUserType == 'driver'
+                        ? 'Login as Customer or Vendor'
+                        : 'Login as Customer or Driver',
+                    style: AppTextStyle.subtext4(AppColor.primary),
+                    textAlign: TextAlign.center,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -176,11 +275,133 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UnifiedRegistrationScreen(),
+                        showModalBottomSheet(
+                          context: context,
+                          showDragHandle: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
                           ),
+                          builder: (BuildContext context) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 4,
+                              ),
+
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: HugeIcon(
+                                      icon: HugeIcons.strokeRoundedBriefcase01,
+                                      color: AppColor.primary,
+                                    ),
+                                    title: Text(
+                                      'Driver',
+                                      style: AppTextStyle.paragraph1(
+                                        AppColor.black,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      'Login as a driver for easy gain request from customers and vendors',
+                                      style: AppTextStyle.subtext4(
+                                        AppColor.blackSubtext,
+                                      ),
+                                    ),
+
+                                    onTap: () {
+                                      Navigator.pop(context);
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  UnifiedRegistrationScreen(
+                                                    userType: 'driver',
+                                                  ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Divider(),
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.storefront_outlined,
+                                      color: AppColor.primary,
+                                    ),
+                                    title: Text(
+                                      'Vendor/Business',
+                                      style: AppTextStyle.paragraph1(
+                                        AppColor.black,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      'Login as a vendor to manage your products and receive orders',
+                                      style: AppTextStyle.subtext4(
+                                        AppColor.blackSubtext,
+                                      ),
+                                    ),
+
+                                    onTap: () {
+                                      Navigator.pop(context);
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  UnifiedRegistrationScreen(
+                                                    userType: 'vendor',
+                                                  ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Divider(),
+                                  ListTile(
+                                    leading: Icon(
+                                      Icons.person_outline,
+                                      color: AppColor.primary,
+                                    ),
+                                    title: Text(
+                                      'Customer',
+                                      style: AppTextStyle.paragraph1(
+                                        AppColor.black,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      'Login as a customer to request deliveries and order products',
+                                      style: AppTextStyle.subtext4(
+                                        AppColor.blackSubtext,
+                                      ),
+                                    ),
+
+                                    onTap: () {
+                                      Navigator.pop(context);
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  UnifiedRegistrationScreen(
+                                                    userType: 'customer',
+                                                  ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  SizedBox(height: 30),
+                                ],
+                              ),
+                            );
+                          },
                         );
                       },
                       child: Text(
