@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sepesha_app/screens/dashboard/account_screen.dart';
+import 'package:sepesha_app/screens/dashboard/new_account_screen.dart';
 import 'package:sepesha_app/screens/dashboard/home_screen.dart';
 import 'package:sepesha_app/screens/dashboard/rides_screen.dart';
-import 'package:sepesha_app/widgets/app_drawer.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -14,35 +13,28 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int _currentPage = 0;
   final PageController _pageController = PageController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<IconData> _icons = [
     Icons.home,
     Icons.car_repair_rounded,
-
     Icons.person,
   ];
 
   final List<String> _titles = ["Home", "Rides", "Account"];
 
-  final List<Widget> _pages = [HomeScreen(), RidesScreen(), AccountScreen()];
+  final List<Widget> _pages = [HomeScreen(), RidesScreen(), NewAccountScreen()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, 
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-        ),
+        title: Text(_titles[_currentPage]), 
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
         ],
       ),
-      drawer: const AppDrawer(),
       body: PageView(
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
@@ -50,8 +42,7 @@ class _DashboardState extends State<Dashboard> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentPage,
-        // selectedItemColor: AppTheme.primary,
-        // unselectedItemColor: AppTheme.textPrimary.withOpacity(0.5),
+        type: BottomNavigationBarType.fixed,
         items: List.generate(
           _icons.length,
           (index) => BottomNavigationBarItem(
@@ -62,16 +53,14 @@ class _DashboardState extends State<Dashboard> {
         onTap: (index) {
           setState(() {
             _currentPage = index;
-            _pageController.jumpToPage(index);
           });
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 }
