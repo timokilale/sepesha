@@ -25,12 +25,12 @@ class SearchingContent extends StatelessWidget {
                 provider.loadingController != null
                     ? RotationTransition(
                       turns: provider.loadingController!,
-                      child: const CircularProgressIndicator(
+                      child: CircularProgressIndicator(
                         color: AppColor.primary,
                         strokeWidth: 3,
                       ),
                     )
-                    : const CircularProgressIndicator(
+                    : CircularProgressIndicator(
                       color: AppColor.primary,
                       strokeWidth: 3,
                     ),

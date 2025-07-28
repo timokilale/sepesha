@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/Utilities/app_images.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: const Text('About'),
@@ -39,14 +41,14 @@ class AboutScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Sepesha',
+                    localizations.appName,
                     style: AppTextStyle.heading2(AppColor.primary).copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Version 1.0.0',
+                    '${localizations.version} 1.0.0',
                     style: AppTextStyle.subtext1(AppColor.grey),
                   ),
                 ],
@@ -95,7 +97,7 @@ class AboutScreen extends StatelessWidget {
             // Copyright
             Center(
               child: Text(
-                '© 2024 Sepesha. All rights reserved.\nLorem ipsum dolor sit amet.',
+                localizations.copyright,
                 textAlign: TextAlign.center,
                 style: AppTextStyle.subtext1(AppColor.grey),
               ),

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:sepesha_app/Utilities/app_color.dart';
 import 'dart:convert';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/Utilities/secret_variables.dart';
 import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/provider/ride_provider.dart';
@@ -409,7 +410,7 @@ class _DestinationCardState extends State<_DestinationCard> {
               const SizedBox(height: 12),
               ContinueButton(
                 isLoading: provider.isLoading,
-                text: "Confirm Location",
+                text: AppLocalizations.of(context)!.confirmLocation,
                 onPressed:
                     provider.destinationLocation == null
                         ? () {}
@@ -574,7 +575,7 @@ class _LocationSearchModalState extends State<LocationSearchModal> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.isPickup ? 'Set Pickup Location' : 'Set Destination',
+                    widget.isPickup ? AppLocalizations.of(context)!.setPickupLocation : AppLocalizations.of(context)!.setDestination,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -631,10 +632,10 @@ class _LocationSearchModalState extends State<LocationSearchModal> {
                           const SizedBox(height: 16),
                           Text(
                             _searchController.text.isEmpty
-                                ? 'Start typing to search for locations'
-                                : _searchController.text.length < 2
-                                    ? 'Type at least 2 characters'
-                                    : 'No locations found',
+                              ? AppLocalizations.of(context)!.startTypingToSearch
+                              : _searchController.text.length < 2
+                                  ? AppLocalizations.of(context)!.typeAtLeast2Characters
+                                  : AppLocalizations.of(context)!.noLocationsFound,
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 16,

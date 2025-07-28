@@ -404,8 +404,14 @@ class AuthServices {
       // Parse user data from user object
       if (data['user_data'] != null) {
         final userData = data['user_data'];
+        final userType = userData['user_type'] ?? 'customer';
+
         Preferences.instance.save(PrefKeys.authKey, userData['uid'] ?? '');
-        Preferences.instance.save('role', userData['user_type'] ?? 'customer');
+        // Store user type consistently in both keys for compatibility
+        Preferences.instance.save('role', userType);
+        Preferences.instance.save('selected_user_type', userType);
+        SessionManager.instance.setUserType(userType);
+
         Preferences.instance.save(
           PrefKeys.firstName,
           userData['first_name'] ?? '',
@@ -604,8 +610,10 @@ class AuthServices {
   static Future<dynamic> getNewAccessToken() async {
     try {
       final refreshToken = await Preferences.instance.refreshToken;
-      final userType =
-          await Preferences.instance.selectedUserType ?? 'customer';
+      // Try multiple sources for user type for better compatibility
+      final userType = await Preferences.instance.selectedUserType ??
+                       await Preferences.instance.getString('role') ??
+                       'customer';
       final url = Uri.parse('$apiBaseUrl/refresh-token');
 
       print('=== REFRESH TOKEN REQUEST ===');

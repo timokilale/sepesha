@@ -3,6 +3,7 @@ import 'package:sepesha_app/screens/dashboard/account_screen.dart';
 import 'package:sepesha_app/screens/dashboard/home_screen.dart';
 import 'package:sepesha_app/screens/dashboard/rides_screen.dart';
 import 'package:sepesha_app/widgets/app_drawer.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 
 class DriverDashboard extends StatefulWidget {
   const DriverDashboard({super.key});
@@ -22,8 +23,10 @@ class _DriverDashboardState extends State<DriverDashboard> {
 
     Icons.person,
   ];
-
-  final List<String> _titles = ["Home", "Rides", "Account"];
+  List<String> _getTitles(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    return [localizations.home, localizations.trips, localizations.account];
+  }
 
   final List<Widget> _pages = [HomeScreen(), RidesScreen(), AccountScreen()];
 
@@ -56,7 +59,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
           _icons.length,
           (index) => BottomNavigationBarItem(
             icon: Icon(_icons[index]),
-            label: _titles[index],
+            label: _getTitles(context)[index],
           ),
         ),
         onTap: (index) {

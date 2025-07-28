@@ -4,6 +4,7 @@ import 'package:sepesha_app/models/conversation_model.dart';
 import 'package:sepesha_app/provider/message_provider.dart';
 import 'package:sepesha_app/widgets/conversation_list_item.dart';
 import 'package:sepesha_app/screens/chat_screen.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 
@@ -123,6 +124,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     super.build(context);
 
     return Scaffold(
@@ -148,6 +150,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final localizations = AppLocalizations.of(context)!;
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -215,23 +218,23 @@ class _ConversationsScreenState extends State<ConversationsScreen>
           onSelected: _handleMenuSelection,
           itemBuilder:
               (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'mark_all_read',
                   child: Row(
                     children: [
-                      Icon(Icons.mark_email_read),
-                      SizedBox(width: 12),
-                      Text('Mark all as read'),
+                      const Icon(Icons.mark_email_read),
+                      const SizedBox(width: 12),
+                      Text(localizations.markAllAsRead),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'settings',
                   child: Row(
                     children: [
-                      Icon(Icons.settings),
-                      SizedBox(width: 12),
-                      Text('Settings'),
+                      const Icon(Icons.settings),
+                      const SizedBox(width: 12),
+                      Text(localizations.settings),
                     ],
                   ),
                 ),
@@ -242,13 +245,14 @@ class _ConversationsScreenState extends State<ConversationsScreen>
   }
 
   Widget _buildSearchBar() {
+    final localizations = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       child: TextField(
         controller: _searchController,
         focusNode: _searchFocusNode,
         decoration: InputDecoration(
-          hintText: 'Search conversations...',
+          hintText: localizations.searchConversations,
           hintStyle: AppTextStyle.bodyTextStyle.copyWith(color: AppColor.grey),
           prefixIcon: Icon(Icons.search, color: AppColor.grey),
           suffixIcon:
@@ -331,6 +335,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
   }
 
   Widget _buildErrorState(MessageProvider messageProvider) {
+    final localizations = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -372,7 +377,7 @@ class _ConversationsScreenState extends State<ConversationsScreen>
                 backgroundColor: AppColor.primary,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Try Again'),
+              child: Text(localizations.tryAgain),
             ),
           ],
         ),
@@ -381,10 +386,11 @@ class _ConversationsScreenState extends State<ConversationsScreen>
   }
 
   Widget _buildEmptyState() {
+    final localizations = AppLocalizations.of(context)!;
     if (_isSearching) {
       return ConversationListEmptyState(
-        title: 'No results found',
-        subtitle: 'Try searching with different keywords',
+        title: localizations.noResultsFound,
+        subtitle: localizations.trySearchingWithDifferentKeywords,
         icon: Icons.search_off,
         onActionPressed: _clearSearch,
         actionText: 'Clear Search',
@@ -425,15 +431,17 @@ class _ConversationsScreenState extends State<ConversationsScreen>
       listen: false,
     );
     // Implement mark all as read functionality
+    final localizations = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('All conversations marked as read')),
+     SnackBar(content: Text(localizations.allConversationsMarkedAsRead)),
     );
   }
 
   void _navigateToSettings() {
     // Navigate to message settings
+    final localizations = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Message settings coming soon')),
+      SnackBar(content: Text(localizations.messageSettingsComingSoon)),
     );
   }
 
@@ -519,6 +527,7 @@ class _NewConversationDialogState extends State<NewConversationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
@@ -538,7 +547,7 @@ class _NewConversationDialogState extends State<NewConversationDialog> {
               child: Row(
                 children: [
                   Text(
-                    'New Conversation',
+                    localizations.newConversation,
                     style: AppTextStyle.headingTextStyle.copyWith(
                       color: Colors.white,
                     ),
@@ -558,7 +567,7 @@ class _NewConversationDialogState extends State<NewConversationDialog> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Search contacts...',
+                  hintText: localizations.searchContacts,
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),

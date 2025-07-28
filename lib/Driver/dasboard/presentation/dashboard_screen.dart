@@ -13,6 +13,7 @@ import 'package:sepesha_app/Driver/dasboard/presentation/widgets/ride_request_ca
 import 'package:sepesha_app/Driver/history/presentation/history_screen.dart';
 import 'package:sepesha_app/Driver/model/ride_model.dart';
 import 'package:sepesha_app/Driver/model/user_model.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/screens/auth/auth_screen.dart';
 import 'package:sepesha_app/Driver/profile/driver_profile_screen.dart';
 import 'package:sepesha_app/Driver/wallet/presentation/wallet_screen.dart';
@@ -552,7 +553,7 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
                 ),
                 Text(
                   'Tsh ${ride.fare.toStringAsFixed(2)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColor.greenBullet,
@@ -809,7 +810,7 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
                       style: const TextStyle(fontSize: 14),
                     ),
                     Text(
-                      '${driver.totalRides} rides completed',
+                      '${driver.totalRides} ${AppLocalizations.of(context)!.ridesCompleted}',
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
@@ -820,7 +821,7 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
 
               ListTile(
                 leading: const Icon(Icons.person),
-                title: const Text('Profile'),
+                title: Text(AppLocalizations.of(context)!.profile),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -833,7 +834,7 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
               ),
               ListTile(
                 leading: const Icon(Icons.account_balance_wallet),
-                title: const Text('Wallet'),
+                title: Text(AppLocalizations.of(context)!.wallet),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -846,7 +847,7 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
               ),
               ListTile(
                 leading: const Icon(Icons.payment),
-                title: const Text('Payment Methods'),
+                title: Text(AppLocalizations.of(context)!.paymentMethods),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -859,7 +860,7 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
+                title: Text(AppLocalizations.of(context)!.settings),
                 onTap: () {
                   Navigator.pop(context);
                   // Navigate to settings
@@ -867,7 +868,7 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
               ),
               ListTile(
                 leading: const Icon(Icons.help),
-                title: const Text('Help & Support'),
+                title: Text(AppLocalizations.of(context)!.helpSupport),
                 onTap: () {
                     Navigator.pop(context);
                     _navigateToSupport(context);
@@ -875,13 +876,13 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
               ),
               const Divider(),
               ListTile(
-  leading: const Icon(Icons.logout),
-  title: const Text('Logout'),
-  onTap: () {
-    Navigator.pop(context);
-    _showLogoutDialog();
-  },
-),
+                leading: const Icon(Icons.logout),
+                title: Text(AppLocalizations.of(context)!.logout),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showLogoutDialog();
+                },
+              ),
             ],
           ),
         );

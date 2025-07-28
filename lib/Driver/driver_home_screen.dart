@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/dashboard_screen.dart';
 import 'package:sepesha_app/Driver/history/presentation/history_screen.dart';
 import 'package:sepesha_app/Driver/account/new_driver_account_screen.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/provider/payment_provider.dart';
 
 class MainLayout extends StatefulWidget {
@@ -34,18 +35,18 @@ class _MainLayoutState extends State<MainLayout> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: AppLocalizations.of(context)!.home,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
-            label: 'Trips',
+            label: AppLocalizations.of(context)!.trips,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person), 
-            label: 'Account',
+            label: AppLocalizations.of(context)!.account,
           ),
         ],
       ),
@@ -53,11 +54,16 @@ class _MainLayoutState extends State<MainLayout> {
   }
 
   String _getTitleForIndex(int index) {
+    final localizations = AppLocalizations.of(context)!;
     switch (index) {
-      case 0: return 'Driver Dashboard';
-      case 1: return 'Trip History';
-      case 2: return 'Account';
-      default: return 'Driver';
+      case 0:
+        return localizations.home;
+      case 1:
+        return localizations.trips;
+      case 2:
+        return localizations.account;
+      default:
+        return localizations.home;
     }
   }
 
@@ -70,9 +76,9 @@ class _MainLayoutState extends State<MainLayout> {
             onPressed: () {
               // Handle notifications - you can navigate to notifications screen here
               // For now, we'll show a simple snackbar
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Notifications feature coming soon!'),
+             ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.notificationsComingSoon),
                   duration: Duration(seconds: 2),
                 ),
               );
@@ -85,9 +91,9 @@ class _MainLayoutState extends State<MainLayout> {
             icon: const Icon(Icons.filter_list_rounded),
             onPressed: () {
               // Handle trip history filters
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Filter trips feature coming soon!'),
+             ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.filterTrips),
                   duration: Duration(seconds: 2),
                 ),
               );

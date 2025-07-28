@@ -6,6 +6,7 @@ import 'package:sepesha_app/components/home/sheet_handle.dart';
 import 'package:sepesha_app/provider/ride_provider.dart';
 import 'package:sepesha_app/widgets/smart_driver_rating.dart';
 import 'package:sepesha_app/screens/dashboard/widgets/driver_info_tile.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 
 class DriverAssignedContent extends StatelessWidget {
   final RideProvider provider;
@@ -24,9 +25,9 @@ class DriverAssignedContent extends StatelessWidget {
         children: [
           const SheetHandle(),
           const SizedBox(height: 16),
-          const Text(
-            'Driver Found',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            AppLocalizations.of(context)!.driverFound,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           const CircleAvatar(
@@ -87,7 +88,7 @@ class DriverAssignedContent extends StatelessWidget {
                           },
                         );
                       },
-                      icon: const Icon(Icons.call, color: AppColor.primary),
+                      icon: Icon(Icons.call, color: AppColor.primary),
                       style: IconButton.styleFrom(
                         backgroundColor: AppColor.white,
                         shape: const CircleBorder(),
@@ -95,7 +96,7 @@ class DriverAssignedContent extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.message, color: AppColor.primary),
+                      icon: Icon(Icons.message, color: AppColor.primary),
                       style: IconButton.styleFrom(
                         backgroundColor: AppColor.white,
                         shape: const CircleBorder(),
@@ -109,19 +110,19 @@ class DriverAssignedContent extends StatelessWidget {
           const SizedBox(height: 16),
           DriverInfoTile(
             icon: Icons.directions_car,
-            title: 'Vehicle',
+            title: AppLocalizations.of(context)!.vehicleType,
             subtitle: provider.carDetails,
           ),
           const Divider(),
           DriverInfoTile(
             icon: Icons.payment,
-            title: 'Payment',
+            title: AppLocalizations.of(context)!.payment,
             subtitle: provider.paymentMethod,
           ),
           const Divider(),
           DriverInfoTile(
             icon: Icons.location_on,
-            title: 'Destination',
+            title: AppLocalizations.of(context)!.destination,
             subtitle: provider.destinationAddress,
           ),
           const SizedBox(height: 16),

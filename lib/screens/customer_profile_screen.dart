@@ -5,7 +5,7 @@ import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/provider/user_profile_provider.dart';
 import 'package:sepesha_app/screens/auth/driver/widgets/image_upload_widget.dart';
-import 'package:sepesha_app/services/session_manager.dart';
+import 'package:sepesha_app/Utilities/feedback_manager.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
   const CustomerProfileScreen({super.key});
@@ -74,7 +74,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                   setState(() {
                     _isEditing = !_isEditing;
                     if (!_isEditing) {
-                      // Reset fields if canceling edit
                       _profileImage = null;
                       _populateFields();
                     }
@@ -508,22 +507,22 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
         _profileImage = null;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully'),
-            backgroundColor: Colors.green,
-          ),
+        context.feedback.showSuccess(
+          context: context,
+          title: 'Success',
+          description: 'Profile updated successfully',
         );
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(provider.errorMessage ?? 'Failed to update profile'),
-            backgroundColor: Colors.red,
-          ),
+        context.feedback.showError(
+          context: context,
+          title: 'Error',
+          description: provider.errorMessage ?? 'Failed to update profile',
         );
       }
     }
   }
+
+
 }

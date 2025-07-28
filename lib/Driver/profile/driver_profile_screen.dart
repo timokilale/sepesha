@@ -6,6 +6,7 @@ import 'package:sepesha_app/Driver/profile/driver_profile_provider.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/components/app_button.dart';
+import 'package:sepesha_app/Utilities/feedback_manager.dart';
 import 'package:sepesha_app/widgets/smart_driver_rating.dart';
 import 'package:sepesha_app/screens/auth/driver/widgets/image_upload_widget.dart';
 
@@ -20,7 +21,6 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
   bool _isEditing = false;
   final _formKey = GlobalKey<FormState>();
   
-  // Controllers for editable fields
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
@@ -34,7 +34,6 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     _emailController = TextEditingController();
     _phoneController = TextEditingController();
     
-    // Load driver profile when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DriverProfileProvider>().loadDriverProfile();
     });
@@ -73,7 +72,6 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                   setState(() {
                     _isEditing = !_isEditing;
                     if (!_isEditing) {
-                      // Reset fields if canceling edit
                       _profileImage = null;
                       if (provider.driverData != null) {
                         _populateFields(provider.driverData!);
@@ -190,11 +188,11 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.green, // Assume online for now
+                color: Colors.green, 
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
-                'Online', // Simplified for now
+                'Online', 
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -243,7 +241,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
           label: 'Phone Number',
           icon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
-          enabled: false, // Phone usually shouldn't be editable
+          enabled: false, 
         ),
       ],
     );
@@ -268,7 +266,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
         const SizedBox(height: 16),
         _buildReadOnlyField(
           label: 'License Number',
-          value: 'Not provided', // License number not available in current User model
+          value: 'Not provided', 
           icon: Icons.credit_card,
         ),
       ],
@@ -316,7 +314,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
             Expanded(
               child: _buildStatCard(
                 'Status',
-                'Active', // Simplified for now
+                'Active', 
                 Icons.circle,
                 Colors.green,
               ),
@@ -487,19 +485,22 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
         _profileImage = null;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
+        context.feedback.showSuccess(
+          context: context,
+          title: 'Success',
+          description: 'Profile updated successfully',
         );
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(provider.errorMessage ?? 'Failed to update profile'),
-            backgroundColor: Colors.red,
-          ),
+        context.feedback.showError(
+          context: context,
+          title: 'Error',
+          description: provider.errorMessage ?? 'Failed to update profile',
         );
       }
     }
   }
+
+
 }

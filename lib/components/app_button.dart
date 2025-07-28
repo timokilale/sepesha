@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
+import 'package:sepesha_app/Utilities/app_button_config.dart';
+import 'package:sepesha_app/Utilities/feedback_manager.dart';
 
-class ContinueButton extends StatelessWidget {
+class ContinueButton extends StatefulWidget {
   final VoidCallback onPressed;
   final bool isLoading;
   final String text;
@@ -33,58 +35,123 @@ class ContinueButton extends StatelessWidget {
   });
 
   @override
+  State<ContinueButton> createState() => _ContinueButtonState();
+}
+
+class _ContinueButtonState extends State<ContinueButton> with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    if (!widget.isLoading) {
+      setState(() => _isPressed = true);
+      _animationController.forward();
+      FeedbackManager.instance.showButtonPress();
+    }
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    if (!widget.isLoading) {
+      setState(() => _isPressed = false);
+      _animationController.reverse();
+    }
+  }
+
+  void _handleTapCancel() {
+    if (!widget.isLoading) {
+      setState(() => _isPressed = false);
+      _animationController.reverse();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          foregroundColor: foregroundColor ?? AppColor.white,
-          backgroundColor: backgroundColor ?? AppColor.primary,
-          padding: padding ?? const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius ?? 12),
-            side: BorderSide(color: borderColor ?? AppColor.primary, width: 1),
-          ),
-          elevation: elevation ?? 0,
-          disabledBackgroundColor: backgroundColor ?? AppColor.lightGrey,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isLoading) ...[
-              SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  color: loadingIndicatorColor ?? AppColor.white,
-                  strokeWidth: 2,
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: SizedBox(
+            width: double.infinity,
+            child: GestureDetector(
+              onTapDown: _handleTapDown,
+              onTapUp: _handleTapUp,
+              onTapCancel: _handleTapCancel,
+              child: ElevatedButton(
+                onPressed: widget.isLoading ? null : widget.onPressed,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: widget.foregroundColor ?? AppColor.white,
+                  backgroundColor: widget.backgroundColor ?? AppColor.primary,
+                  padding: widget.padding ?? AppButtonConfig.padding,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(widget.borderRadius ?? AppButtonConfig.borderRadius),
+                    side: BorderSide(color: widget.borderColor ?? AppColor.primary, width: 1),
+                  ),
+                  elevation: widget.elevation ?? 0,
+                  disabledBackgroundColor: widget.backgroundColor ?? AppColor.lightGrey,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.isLoading) ...[
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: widget.loadingIndicatorColor ?? AppColor.white,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    if (widget.icon != null && !widget.isLoading) ...[
+                      Icon(widget.icon),
+                      const SizedBox(width: 4),
+                    ],
+                    Text(
+                      widget.text,
+                      style: TextStyle(
+                        fontSize: AppButtonConfig.fontSize,
+                        fontWeight: FontWeight.bold,
+                        color: widget.textColor ?? AppColor.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-            ],
-            if (icon != null && !isLoading) ...[
-              Icon(icon),
-              const SizedBox(width: 4),
-            ],
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: textColor ?? AppColor.white,
-              ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
-// Generic AppButton class for general use
-class AppButton extends StatelessWidget {
+class AppButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final String text;
   final Color? backgroundColor;
@@ -111,59 +178,123 @@ class AppButton extends StatelessWidget {
   });
 
   @override
+  State<AppButton> createState() => _AppButtonState();
+}
+
+class _AppButtonState extends State<AppButton> with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    if (!widget.isLoading) {
+      setState(() => _isPressed = true);
+      _animationController.forward();
+      FeedbackManager.instance.showButtonPress();
+    }
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    if (!widget.isLoading) {
+      setState(() => _isPressed = false);
+      _animationController.reverse();
+    }
+  }
+
+  void _handleTapCancel() {
+    if (!widget.isLoading) {
+      setState(() => _isPressed = false);
+      _animationController.reverse();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          foregroundColor: foregroundColor ?? AppColor.white,
-          backgroundColor: backgroundColor ?? AppColor.primary,
-          padding: padding ?? const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius ?? 12),
-            side: BorderSide(
-              color: borderColor ?? backgroundColor ?? AppColor.primary,
-              width: 1,
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: SizedBox(
+            width: double.infinity,
+            child: GestureDetector(
+              onTapDown: _handleTapDown,
+              onTapUp: _handleTapUp,
+              onTapCancel: _handleTapCancel,
+              child: ElevatedButton(
+                onPressed: widget.isLoading ? null : widget.onPressed,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: widget.foregroundColor ?? AppColor.white,
+                  backgroundColor: widget.backgroundColor ?? AppColor.primary,
+                  padding: widget.padding ?? AppButtonConfig.padding,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(widget.borderRadius ?? AppButtonConfig.borderRadius),
+                    side: BorderSide(
+                      color: widget.borderColor ?? widget.backgroundColor ?? AppColor.primary,
+                      width: 1,
+                    ),
+                  ),
+                  elevation: widget.elevation ?? 0,
+                  disabledBackgroundColor: AppColor.lightGrey,
+                ),
+                child: widget.isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: widget.foregroundColor ?? AppColor.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (widget.icon != null) ...[
+                            Icon(widget.icon, size: 18),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(
+                            widget.text,
+                            style: TextStyle(
+                              fontSize: AppButtonConfig.fontSize,
+                              fontWeight: FontWeight.w600,
+                              color: widget.foregroundColor ?? AppColor.white,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ),
-          elevation: elevation ?? 0,
-          disabledBackgroundColor: AppColor.lightGrey,
-        ),
-        child:
-            isLoading
-                ? SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    color: foregroundColor ?? AppColor.white,
-                    strokeWidth: 2,
-                  ),
-                )
-                : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (icon != null) ...[
-                      Icon(icon, size: 18),
-                      const SizedBox(width: 8),
-                    ],
-                    Text(
-                      text,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: foregroundColor ?? AppColor.white,
-                      ),
-                    ),
-                  ],
-                ),
-      ),
+        );
+      },
     );
   }
 }
 
-// Utility class for showing consistent loading modals
 class LoadingModal {
   static void show(BuildContext context, {String message = 'Loading...'}) {
     showDialog(

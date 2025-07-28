@@ -6,6 +6,7 @@ import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_images.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/screens/auth/auth_screen.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -19,32 +20,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int currentIndex = 0;
 
-  List<Map<String, String>> onboardingPages = [
-    {
-      "image": AppImages.onBoardingImage1,
-      "title": "Save time, save money and",
-      "highlight": "safe ride",
-      "description":
-          "Use your smartphone to order a ride, get picked up by a nearby driver, and enjoy a low-cost trip to your destination.",
-    },
-    {
-      "image": AppImages.onBoardingImage2,
-      "title": "Get connected with",
-      "highlight": "nearby drivers",
-      "description":
-          "Quickly match with reliable drivers around you for faster pickups and better service.",
-    },
-    {
-      "image": AppImages.onBoardingImage3,
-      "title": "Enjoy a ride with",
-      "highlight": "full comfort",
-      "description":
-          "Relax in well-maintained vehicles while your driver takes care of the road.",
-    },
-  ];
+  List<Map<String, String>> getOnboardingPages(AppLocalizations localizations) {
+    return [
+      {
+        "image": AppImages.onBoardingImage1,
+        "title": localizations.saveTimeSaveMoneyAnd,
+        "highlight": localizations.safeRide,
+        "description": localizations.useYourSmartphoneToOrder,
+      },
+      {
+        "image": AppImages.onBoardingImage2,
+        "title": localizations.getConnectedWith,
+        "highlight": localizations.nearbyDrivers,
+        "description": localizations.quicklyMatchWithReliable,
+      },
+      {
+        "image": AppImages.onBoardingImage3,
+        "title": localizations.enjoyARideWith,
+        "highlight": localizations.fullComfort,
+        "description": localizations.relaxInWellMaintained,
+      },
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final onboardingPages = getOnboardingPages(localizations);
     return Scaffold(
       backgroundColor: AppColor.white2,
       body: Column(

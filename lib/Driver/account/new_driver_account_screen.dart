@@ -7,6 +7,7 @@ import 'package:sepesha_app/Driver/wallet/presentation/wallet_screen.dart';
 import 'package:sepesha_app/screens/payment_methods_screen.dart';
 import 'package:sepesha_app/screens/auth/support/support_screen.dart';
 import 'package:sepesha_app/screens/auth/auth_screen.dart';
+import 'package:sepesha_app/screens/settings_screen.dart';
 import 'package:sepesha_app/services/auth_services.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/data/dashboard_repository.dart';
 import 'package:sepesha_app/Driver/model/user_model.dart';
@@ -175,9 +176,10 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                           title: 'Settings',
                           subtitle: 'App preferences and settings',
                           color: Colors.grey,
-                          onTap: () {
-                            // Navigate to settings when implemented
-                          },
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                          ),
                         ),
                         const SizedBox(height: 12),
                         _buildEnhancedMenuItem(

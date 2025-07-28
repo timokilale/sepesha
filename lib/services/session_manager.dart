@@ -76,12 +76,21 @@ class SessionManager {
         _phone = int.tryParse(phoneString);
       }
 
-      // Restore user type from preferences
-      _userType = await Preferences.instance.getString('selected_user_type');
+      // Restore user type from preferences - try both keys for compatibility
+      _userType = await Preferences.instance.selectedUserType ??
+                  await Preferences.instance.getString('role') ??
+                  'customer';
+
+      // Restore user data object if available
+      final userData = await Preferences.instance.userDataObject;
+      if (userData != null) {
+        _user = userData;
+      }
 
       // Restore other session data as needed
       debugPrint('Session restored successfully');
       debugPrint('Restored user type: $_userType');
+      debugPrint('Restored user data: ${_user != null ? 'Yes' : 'No'}');
     } catch (e) {
       debugPrint('Error restoring session: $e');
     }

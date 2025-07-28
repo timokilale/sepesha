@@ -397,7 +397,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         labelStyle: TextStyle(color: AppColor.blackText),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColor.grey),
+          borderSide: BorderSide(color: AppColor.grey),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -500,7 +500,7 @@ Widget _buildTextField({
       labelStyle: TextStyle(color: AppColor.blackText),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColor.grey),
+        borderSide: BorderSide(color: AppColor.grey),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -826,17 +826,17 @@ class _VehicleDetailsState extends State<VehicleDetails> {
           labelText: label,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColor.grey),
+            borderSide: BorderSide(color: AppColor.grey),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColor.grey),
+            borderSide: BorderSide(color: AppColor.grey),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColor.primary, width: 2),
+            borderSide: BorderSide(color: AppColor.primary, width: 2),
           ),
-          labelStyle: const TextStyle(color: AppColor.blackText),
+          labelStyle: TextStyle(color: AppColor.blackText),
         ),
         value: value,
         items:
@@ -976,7 +976,7 @@ class _IdentityDocumentsScreenState extends State<IdentityDocumentsScreen> {
                 ),
               ),
               if (isCompleted)
-                const Icon(
+                Icon(
                   Icons.check_circle,
                   color: AppColor.primary,
                   size: 24,
@@ -1159,7 +1159,7 @@ class _IdentityDocumentsScreenState extends State<IdentityDocumentsScreen> {
                       : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.cloud_upload,
                             size: 40,
                             color: AppColor.grey,
@@ -1371,8 +1371,8 @@ class _IdentityDocumentsScreenState extends State<IdentityDocumentsScreen> {
     debugPrint('Submitting all documents: $payload');
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Documents submitted successfully!'),
+      SnackBar(
+        content: const Text('Documents submitted successfully!'),
         backgroundColor: AppColor.primary,
         behavior: SnackBarBehavior.floating,
       ),

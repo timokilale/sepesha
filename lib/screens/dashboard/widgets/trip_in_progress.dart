@@ -32,7 +32,7 @@ class TripInProgressContent extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.location_on, color: AppColor.primary),
+                Icon(Icons.location_on, color: AppColor.primary),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(

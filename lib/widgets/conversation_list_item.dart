@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/models/conversation_model.dart';
 import 'package:sepesha_app/models/message_model.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
@@ -96,7 +97,7 @@ class ConversationListItem extends StatelessWidget {
                       // Last message and unread count row
                       Row(
                         children: [
-                          Expanded(child: _buildLastMessagePreview()),
+                          Expanded(child: _buildLastMessagePreview(context)),
 
                           const SizedBox(width: 8),
 
@@ -219,14 +220,14 @@ class ConversationListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildLastMessagePreview() {
+  Widget _buildLastMessagePreview(BuildContext context) {
     if (isTyping) {
       return Row(
         children: [
           Icon(Icons.edit, size: 14, color: AppColor.primary),
           const SizedBox(width: 4),
           Text(
-            'typing...',
+            AppLocalizations.of(context)!.typing ,
             style: AppTextStyle.bodyTextStyle.copyWith(
               color: AppColor.primary,
               fontStyle: FontStyle.italic,
@@ -239,7 +240,7 @@ class ConversationListItem extends StatelessWidget {
     final lastMessage = conversation.lastMessage;
     if (lastMessage == null) {
       return Text(
-        'No messages yet',
+        AppLocalizations.of(context)!.noMessagesYet,
         style: AppTextStyle.bodyTextStyle.copyWith(
           color: AppColor.grey,
           fontStyle: FontStyle.italic,
@@ -411,19 +412,19 @@ class SwipeableConversationListItem extends StatelessWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Delete Conversation'),
+            title: Text(AppLocalizations.of(context)!.deleteConversation),
             content: Text(
-              'Are you sure you want to delete this conversation with ${conversation.participantName}?',
+              '${AppLocalizations.of(context)!.areYouSureDeleteConversation} ${conversation.participantName}?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text('Delete'),
+                child: Text(AppLocalizations.of(context)!.delete),
               ),
             ],
           ),
@@ -461,7 +462,7 @@ class ConversationListEmptyState extends StatelessWidget {
             const SizedBox(height: 24),
 
             Text(
-              title,
+              title == 'No conversations yet' ? AppLocalizations.of(context)!.noConversationsYet : title,
               style: AppTextStyle.headingTextStyle.copyWith(
                 color: AppColor.grey,
               ),
@@ -471,7 +472,9 @@ class ConversationListEmptyState extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              subtitle,
+              subtitle == 'Start a new conversation to begin messaging' 
+                ? AppLocalizations.of(context)!.startNewConversationToBeginMessaging 
+                : subtitle,
               style: AppTextStyle.bodyTextStyle.copyWith(color: AppColor.grey),
               textAlign: TextAlign.center,
             ),

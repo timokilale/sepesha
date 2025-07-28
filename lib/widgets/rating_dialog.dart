@@ -3,6 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/components/app_button.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/services/rating_service.dart';
 
 class RatingDialog extends StatefulWidget {
@@ -82,6 +83,7 @@ class _RatingDialogState extends State<RatingDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
@@ -198,7 +200,7 @@ class _RatingDialogState extends State<RatingDialog> {
                               Navigator.of(context).pop();
                             },
                     child: Text(
-                      'Skip',
+                      localizations.skip,
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                   ),
@@ -207,7 +209,7 @@ class _RatingDialogState extends State<RatingDialog> {
                 Expanded(
                   flex: 2,
                   child: AppButton(
-                    text: _isSubmitting ? 'Submitting...' : 'Submit Rating',
+                    text: _isSubmitting ? localizations.submitting : localizations.submitRating,
                     onPressed: _isSubmitting ? null : _submitRating,
                     backgroundColor: AppColor.primaryColor,
                   ),

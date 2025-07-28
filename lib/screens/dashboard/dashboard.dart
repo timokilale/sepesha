@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/screens/dashboard/new_account_screen.dart';
 import 'package:sepesha_app/screens/dashboard/home_screen.dart';
 import 'package:sepesha_app/screens/dashboard/rides_screen.dart';
@@ -20,8 +21,10 @@ class _DashboardState extends State<Dashboard> {
     Icons.person,
   ];
 
-  final List<String> _titles = ["Home", "Rides", "Account"];
-
+List<String> _getTitles(BuildContext context) {
+  final localizations = AppLocalizations.of(context)!;
+  return [localizations.home, localizations.trips, localizations.account];
+}
   final List<Widget> _pages = [HomeScreen(), RidesScreen(), NewAccountScreen()];
 
   @override
@@ -30,7 +33,7 @@ class _DashboardState extends State<Dashboard> {
       appBar: AppBar(
         automaticallyImplyLeading: false, 
         elevation: 0,
-        title: Text(_titles[_currentPage]), 
+        title: Text(_getTitles(context)[_currentPage]), 
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
         ],
@@ -44,12 +47,12 @@ class _DashboardState extends State<Dashboard> {
         currentIndex: _currentPage,
         type: BottomNavigationBarType.fixed,
         items: List.generate(
-          _icons.length,
-          (index) => BottomNavigationBarItem(
-            icon: Icon(_icons[index]),
-            label: _titles[index],
-          ),
-        ),
+    _icons.length,
+    (index) => BottomNavigationBarItem(
+      icon: Icon(_icons[index]),
+      label: _getTitles(context)[index],
+    ),
+  ),
         onTap: (index) {
           setState(() {
             _currentPage = index;

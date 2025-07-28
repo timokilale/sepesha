@@ -254,7 +254,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Back',
                           style: TextStyle(
                             fontSize: 16,

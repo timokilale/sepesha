@@ -8,7 +8,9 @@ import 'package:sepesha_app/screens/auth/auth_screen.dart';
 import 'package:sepesha_app/screens/auth/support/support_screen.dart';
 import 'package:sepesha_app/screens/customer_profile_screen.dart';
 import 'package:sepesha_app/screens/payment_methods_screen.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/screens/conversation_list_screen.dart';
+import 'package:sepesha_app/screens/settings_screen.dart';
 import 'package:sepesha_app/services/auth_services.dart';
 import 'package:sepesha_app/services/preferences.dart';
 import 'package:sepesha_app/services/session_manager.dart';
@@ -94,6 +96,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColor.white2,
       body: RefreshIndicator(
@@ -124,16 +127,16 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
                         // Main Actions Section
                         _buildEnhancedMenuItem(
                           icon: Icons.person_outline_rounded,
-                          title: 'Personal Information',
-                          subtitle: 'Manage your profile details',
+                          title: localizations.personalInformation,
+                          subtitle: localizations.manageProfileDetails,
                           color: AppColor.primary,
                           onTap: () => _navigateToProfile(),
                         ),
                         const SizedBox(height: 12),
                         _buildEnhancedMenuItem(
                           icon: Icons.payment_rounded,
-                          title: 'Payment Methods',
-                          subtitle: 'Manage your payment options',
+                          title: localizations.paymentMethods,
+                          subtitle: localizations.managePaymentOptions,
                           color: Colors.green,
                           onTap: () => Navigator.push(
                             context,
@@ -143,8 +146,8 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
                         const SizedBox(height: 12),
                         _buildEnhancedMenuItem(
                           icon: Icons.chat_bubble_outline_rounded,
-                          title: 'Messages',
-                          subtitle: 'View your conversations',
+                          title: localizations.messages,
+                          subtitle: localizations.viewConversations,
                           color: Colors.blue,
                           onTap: () => Navigator.push(
                             context,
@@ -153,9 +156,20 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
                         ),
                         const SizedBox(height: 12),
                         _buildEnhancedMenuItem(
+                          icon: Icons.settings_rounded,
+                          title: localizations.settings,
+                          subtitle: localizations.appPreferencesSettings,
+                          color: Colors.grey,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildEnhancedMenuItem(
                           icon: Icons.help_outline_rounded,
-                          title: 'Help & Support',
-                          subtitle: 'Get help and support',
+                          title: localizations.helpSupport,
+                          subtitle: localizations.getHelpSupport,
                           color: Colors.orange,
                           onTap: () => Navigator.push(
                             context,
@@ -165,8 +179,8 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
                         const SizedBox(height: 12),
                         _buildEnhancedMenuItem(
                           icon: Icons.info_outline_rounded,
-                          title: 'About',
-                          subtitle: 'App information and version',
+                          title: localizations.about,
+                          subtitle: localizations.appInformationVersion,
                           color: Colors.purple,
                           onTap: () => Navigator.push(
                             context,
@@ -176,8 +190,8 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
                         const SizedBox(height: 12),
                         _buildEnhancedMenuItem(
                           icon: Icons.logout_rounded,
-                          title: 'Logout',
-                          subtitle: 'Sign out of your account',
+                          title: localizations.logout,
+                          subtitle: localizations.signOutAccount,
                           color: Colors.red,
                           onTap: () => _showLogoutDialog(),
                           isDestructive: true,
@@ -196,8 +210,9 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
   }
 
   Widget _buildEnhancedProfileHeader() {
+    final localizations = AppLocalizations.of(context)!;
     final fullName = '${firstName ?? ''} ${lastName ?? ''}'.trim();
-    final displayName = fullName.isNotEmpty ? fullName : 'User';
+    final displayName = fullName.isNotEmpty ? fullName : localizations.user;
 
     return Container(
       width: double.infinity,
@@ -532,6 +547,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final localizations = AppLocalizations.of(context)!;
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -541,20 +557,20 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
               Icon(Icons.logout_rounded, color: Colors.red, size: 28),
               const SizedBox(width: 12),
               Text(
-                'Logout',
+                localizations.logout,
                 style: AppTextStyle.heading3(AppColor.blackText),
               ),
             ],
           ),
           content: Text(
-            'Are you sure you want to logout from your account?',
+            localizations.logoutConfirmation,
             style: AppTextStyle.paragraph1(AppColor.grey),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
-                'Cancel',
+                localizations.cancel,
                 style: AppTextStyle.paragraph2(AppColor.grey),
               ),
             ),
@@ -577,7 +593,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
                 ),
               ),
               child: Text(
-                'Logout',
+                localizations.logout,
                 style: AppTextStyle.paragraph2(AppColor.white).copyWith(
                   fontWeight: FontWeight.w600,
                 ),

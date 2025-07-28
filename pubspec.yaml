@@ -55,6 +55,8 @@ dependencies:
   google_fonts: ^6.2.1
   hugeicons: ^0.0.10
   intl: any
+  flutter_localizations:
+    sdk: flutter
   cached_network_image: any
   permission_handler: any
   flutter_rating_bar: ^4.0.1
@@ -75,6 +77,7 @@ dependencies:
   archive: ^4.0.7
   web_socket_channel: ^3.0.3
   shared_preferences: ^2.5.3 
+  flutter_gen: ^5.11.0
   
 
 
@@ -99,6 +102,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Enable internationalization
+  generate: true
 
   # To add assets to your application, add an assets section, like this:
   assets:

@@ -3,7 +3,9 @@ import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/components/home/sheet_handle.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 import 'package:sepesha_app/provider/ride_provider.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 
 class DriverArrivedContent extends StatelessWidget {
   final RideProvider provider;
@@ -19,9 +21,9 @@ class DriverArrivedContent extends StatelessWidget {
         children: [
           const SheetHandle(),
           const SizedBox(height: 16),
-          const Text(
-            'Your driver has arrived',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            AppLocalizations.of(context)!.yourDriverHasArrived,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           const CircleAvatar(
@@ -31,7 +33,7 @@ class DriverArrivedContent extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${provider.driverName} is waiting',
+            '${provider.driverName} ${AppLocalizations.of(context)!.isWaiting}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),

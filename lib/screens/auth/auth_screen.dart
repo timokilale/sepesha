@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sepesha_app/provider/localization_provider.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
@@ -10,6 +12,7 @@ import 'package:sepesha_app/components/app_button.dart';
 import 'package:sepesha_app/provider/user_registration_provider.dart';
 import 'package:sepesha_app/screens/auth/unified_registration_screen.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:sepesha_app/l10n/app_localizations.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -39,8 +42,25 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColor.white2,
+        appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => _showLanguageSelector(context),
+            icon: Icon(
+              Icons.language,
+              color: AppColor.primary,
+              size: 28,
+            ),
+            tooltip: localizations.selectLanguage,
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -76,8 +96,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   style: AppTextStyle.paragraph2(AppColor.lightBlack),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Enter your phone number We\'ll send you a verification code',
+               Text(
+                  localizations.enterPhoneVerification,
                   style: AppTextStyle.subtext4(AppColor.lightBlack),
                   textAlign: TextAlign.center,
                 ),
@@ -89,7 +109,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 const SizedBox(height: 32),
                 IntlPhoneField(
                   decoration: InputDecoration(
-                    labelText: 'Phone Number',
+                    labelText: localizations.phoneNumber,
                     labelStyle: AppTextStyle.paragraph1(AppColor.lightBlack),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -124,7 +144,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     backgroundColor: AppColor.white2,
                     searchFieldCursorColor: AppColor.primary,
                     searchFieldInputDecoration: InputDecoration(
-                      hintText: 'Search country...',
+                      hintText: localizations.searchCountry,
                     ),
                   ),
                   keyboardType: TextInputType.phone,
@@ -162,13 +182,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                   color: AppColor.primary,
                                 ),
                                 title: Text(
-                                  'Driver',
+                                  localizations.driver,
                                   style: AppTextStyle.paragraph1(
                                     AppColor.black,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  'Login as a driver for easy gain request from customers and vendors',
+                                  localizations.driverDescription,
                                   style: AppTextStyle.subtext4(
                                     AppColor.blackSubtext,
                                   ),
@@ -187,13 +207,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                   color: AppColor.primary,
                                 ),
                                 title: Text(
-                                  'Vendor/Business',
+                                  localizations.vendorBusiness,
                                   style: AppTextStyle.paragraph1(
                                     AppColor.black,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  'Login as a vendor to manage your products and receive orders',
+                                 localizations.vendorDescription,
                                   style: AppTextStyle.subtext4(
                                     AppColor.blackSubtext,
                                   ),
@@ -212,13 +232,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                   color: AppColor.primary,
                                 ),
                                 title: Text(
-                                  'Customer',
+                                  localizations.customer,
                                   style: AppTextStyle.paragraph1(
                                     AppColor.black,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  'Login as a customer to request deliveries and order products',
+                                  localizations.customerDescription,
                                   style: AppTextStyle.subtext4(
                                     AppColor.blackSubtext,
                                   ),
@@ -239,10 +259,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   },
                   child: Text(
                     _selectedUserType == 'customer'
-                        ? 'Login as Driver or Vendor'
-                        : _selectedUserType == 'driver'
-                        ? 'Login as Customer or Vendor'
-                        : 'Login as Customer or Driver',
+                      ? localizations.loginAsDriverOrVendor
+                      : _selectedUserType == 'driver'
+                      ? localizations.loginAsCustomerOrVendor
+                      : localizations.loginAsCustomerOrDriver,
                     style: AppTextStyle.subtext4(AppColor.primary),
                     textAlign: TextAlign.center,
                   ),
@@ -251,7 +271,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
                 ContinueButton(
                   isLoading: _userRegistration.isLoading,
-                  text: "Login",
+                  text: localizations.login,
                   onPressed: () {
                     if (phoneNumber != null) {
                       _userRegistration.userLogin(
@@ -267,7 +287,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Not registered? ',
+                      localizations.notRegistered,
                       style: TextStyle(
                         color: AppColor.lightBlack,
                         fontSize: 16,
@@ -302,13 +322,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                       color: AppColor.primary,
                                     ),
                                     title: Text(
-                                      'Driver',
+                                      localizations.driver,
                                       style: AppTextStyle.paragraph1(
                                         AppColor.black,
                                       ),
                                     ),
                                     subtitle: Text(
-                                      'Login as a driver for easy gain request from customers and vendors',
+                                      localizations.driverDescription,
                                       style: AppTextStyle.subtext4(
                                         AppColor.blackSubtext,
                                       ),
@@ -336,13 +356,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                       color: AppColor.primary,
                                     ),
                                     title: Text(
-                                      'Vendor/Business',
+                                      localizations.vendorBusiness,
                                       style: AppTextStyle.paragraph1(
                                         AppColor.black,
                                       ),
                                     ),
                                     subtitle: Text(
-                                      'Login as a vendor to manage your products and receive orders',
+                                      localizations.vendorDescription,
                                       style: AppTextStyle.subtext4(
                                         AppColor.blackSubtext,
                                       ),
@@ -370,13 +390,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                       color: AppColor.primary,
                                     ),
                                     title: Text(
-                                      'Customer',
+                                      localizations.customer,
                                       style: AppTextStyle.paragraph1(
                                         AppColor.black,
                                       ),
                                     ),
                                     subtitle: Text(
-                                      'Login as a customer to request deliveries and order products',
+                                      localizations.customerDescription,
                                       style: AppTextStyle.subtext4(
                                         AppColor.blackSubtext,
                                       ),
@@ -405,7 +425,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         );
                       },
                       child: Text(
-                        'Sign Up',
+                        localizations.signUp,
                         style: TextStyle(
                           color: AppColor.primary,
                           fontWeight: FontWeight.w600,
@@ -421,28 +441,28 @@ class _AuthScreenState extends State<AuthScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text.rich(
                     TextSpan(
-                      text: 'By continuing, you agree to our ',
+                      text: localizations.byContinuingYouAgree,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
                       ),
                       children: [
                         TextSpan(
-                          text: 'Terms & Conditions',
+                          text: localizations.termsConditions,
                           style: TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.red.shade600,
                           ),
                         ),
-                        const TextSpan(text: ' and '),
+                        TextSpan(text: localizations.and),
                         TextSpan(
-                          text: 'Privacy Policy',
+                          text: localizations.privacyPolicy,
                           style: TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.red.shade600,
                           ),
                         ),
-                        const TextSpan(text: '. You\'re over 18.'),
+                        TextSpan(text: localizations.youreOver18),
                       ],
                     ),
                     textAlign: TextAlign.center,
@@ -455,4 +475,52 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
+
+  void _showLanguageSelector(BuildContext context) {
+  final localizationProvider = Provider.of<LocalizationProvider>(context, listen: false);
+  final localizations = AppLocalizations.of(context)!;
+  
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            localizations.selectLanguage,
+            style: AppTextStyle.headingTextStyle,
+          ),
+          const SizedBox(height: 20),
+          ListTile(
+            leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
+            title: Text(localizations.english),
+            trailing: localizationProvider.locale.languageCode == 'en'
+                ? Icon(Icons.check, color: AppColor.primary)
+                : null,
+            onTap: () {
+              localizationProvider.setLocale(const Locale('en'));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Text('🇹🇿', style: TextStyle(fontSize: 24)),
+            title: Text(localizations.swahili),
+            trailing: localizationProvider.locale.languageCode == 'sw'
+                ? Icon(Icons.check, color: AppColor.primary)
+                : null,
+            onTap: () {
+              localizationProvider.setLocale(const Locale('sw'));
+              Navigator.pop(context);
+            },
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    ),
+  );
+}
 }
