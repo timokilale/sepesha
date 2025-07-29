@@ -133,8 +133,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                     _buildProfileHeader(user),
                     const SizedBox(height: 24),
                     _buildPersonalInfo(user),
-                    const SizedBox(height: 24),
-                    _buildAccountInfo(user),
                     const SizedBox(height: 32),
                     if (_isEditing) _buildActionButtons(provider),
                   ],
@@ -190,19 +188,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColor.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                user.userType?.toUpperCase() ?? 'CUSTOMER',
-                style: AppTextStyle.subtext1(AppColor.primary).copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -257,48 +242,14 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
             return null;
           },
         ),
-      ],
-    );
-  }
-
-  Widget _buildAccountInfo(dynamic user) {
-    return _buildSection(
-      title: 'Account Information',
-      icon: Icons.account_circle,
-      children: [
-        _buildReadOnlyField(
+        const SizedBox(height: 16),
+        _buildTextField(
+          controller: _phoneController,
           label: 'Phone Number',
-          value: '+255 ${user.phoneNumber ?? 'Not provided'}',
           icon: Icons.phone_outlined,
+          enabled: false, // Phone number should not be editable
+          keyboardType: TextInputType.phone,
         ),
-        const SizedBox(height: 16),
-        _buildReadOnlyField(
-          label: 'User Type',
-          value: user.userType?.toUpperCase() ?? 'CUSTOMER',
-          icon: Icons.badge_outlined,
-        ),
-        const SizedBox(height: 16),
-        _buildReadOnlyField(
-          label: 'Account Status',
-          value: (user.isVerified ?? false) ? 'Verified' : 'Unverified',
-          icon: Icons.verified_user_outlined,
-        ),
-        if (user.walletBalanceTzs != null) ...[
-          const SizedBox(height: 16),
-          _buildReadOnlyField(
-            label: 'Wallet Balance (TZS)',
-            value: 'TZS ${user.walletBalanceTzs!.toStringAsFixed(0)}',
-            icon: Icons.account_balance_wallet_outlined,
-          ),
-        ],
-        if (user.walletBalanceUsd != null) ...[
-          const SizedBox(height: 16),
-          _buildReadOnlyField(
-            label: 'Wallet Balance (USD)',
-            value: 'USD ${user.walletBalanceUsd!.toStringAsFixed(2)}',
-            icon: Icons.attach_money_outlined,
-          ),
-        ],
       ],
     );
   }
