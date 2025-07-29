@@ -8,6 +8,7 @@ class User {
   final double walletBalance;
   final double rating;
   final int totalRides;
+  final bool isVerified;
 
   User({
     required this.id,
@@ -19,5 +20,6 @@ class User {
     required this.walletBalance,
     required this.rating,
     required this.totalRides,
+    required this.isVerified,
   });
 }

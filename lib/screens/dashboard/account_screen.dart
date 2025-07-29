@@ -195,26 +195,6 @@ class _AccountScreenState extends State<AccountScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                if (email != null)
-                  Text(
-                    email!,
-                    style: AppTextStyle.subtext1(AppColor.white.withOpacity(0.9)),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColor.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    userType?.toUpperCase() ?? 'USER',
-                    style: AppTextStyle.paragraph1(AppColor.white),
-                  ),
-                ),
               ],
             ),
           ),

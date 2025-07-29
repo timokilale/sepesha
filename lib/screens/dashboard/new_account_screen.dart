@@ -298,45 +298,8 @@ class _NewAccountScreenState extends State<NewAccountScreen> with TickerProvider
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        if (email != null)
-                          Text(
-                            email!,
-                            style: AppTextStyle.paragraph2(
-                              AppColor.white.withValues(alpha: 0.9),
-                            ).copyWith(
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  offset: const Offset(0, 1),
-                                  blurRadius: 2,
-                                ),
-                              ],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        ),                        
                         const SizedBox(height: 8),
-                        // User Type Badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppColor.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppColor.white.withValues(alpha: 0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Text(
-                            userType?.toUpperCase() ?? 'USER',
-                            style: AppTextStyle.caption(AppColor.white).copyWith(
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

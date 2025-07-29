@@ -46,6 +46,7 @@ class WalletRepository {
                 : 0.0,
         rating: driverRating?.averageRating ?? 0.0,
         totalRides: driverRating?.totalReviews ?? 0,
+        isVerified: userData.isVerified ?? false,
       );
     } catch (e) {
       print('Error getting driver data: $e');
@@ -95,6 +96,7 @@ class WalletRepository {
       walletBalance: 0.0,
       rating: 0.0,
       totalRides: 0,
+      isVerified: false,
     );
   }
 }

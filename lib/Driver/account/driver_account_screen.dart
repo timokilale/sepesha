@@ -49,6 +49,7 @@ class _DriverAccountScreenState extends State<DriverAccountScreen> {
           walletBalance: 0.0,
           rating: 0.0,
           totalRides: 0,
+          isVerified: false,
         );
       });
     }
@@ -205,14 +206,7 @@ class _DriverAccountScreenState extends State<DriverAccountScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  driverData?.email ?? 'driver@sepesha.com',
-                  style: AppTextStyle.subtext1(AppColor.white.withOpacity(0.9)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
+               
                 Row(
                   children: [
                     Container(
@@ -222,7 +216,7 @@ class _DriverAccountScreenState extends State<DriverAccountScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'DRIVER',
+                        (driverData?.isVerified ?? false) ? 'VERIFIED' : 'UNVERIFIED',
                         style: AppTextStyle.paragraph4(AppColor.white),
                       ),
                     ),

@@ -698,6 +698,7 @@ Future<void> _requestLocationAndMoveCamera(DashboardViewModel viewModel) async {
               walletBalance: 0.0,
               rating: 0.0,
               totalRides: 0,
+              isVerified: false,
             );
 
         return Drawer(

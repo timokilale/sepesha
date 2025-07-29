@@ -4,6 +4,8 @@ import 'package:sepesha_app/Utilities/app_color.dart';
 import 'package:sepesha_app/Utilities/app_text_style.dart';
 import 'package:sepesha_app/Driver/profile/driver_profile_screen.dart';
 import 'package:sepesha_app/Driver/wallet/presentation/wallet_screen.dart';
+import 'package:sepesha_app/models/user_data.dart';
+import 'package:sepesha_app/repositories/user_profile_repository.dart';
 import 'package:sepesha_app/screens/payment_methods_screen.dart';
 import 'package:sepesha_app/screens/auth/support/support_screen.dart';
 import 'package:sepesha_app/screens/auth/auth_screen.dart';
@@ -12,6 +14,7 @@ import 'package:sepesha_app/services/auth_services.dart';
 import 'package:sepesha_app/Driver/dasboard/presentation/data/dashboard_repository.dart';
 import 'package:sepesha_app/Driver/model/user_model.dart';
 import 'package:sepesha_app/provider/payment_provider.dart';
+import 'package:sepesha_app/services/session_manager.dart';
 
 class NewDriverAccountScreen extends StatefulWidget {
   const NewDriverAccountScreen({super.key});
@@ -21,7 +24,8 @@ class NewDriverAccountScreen extends StatefulWidget {
 }
 
 class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with TickerProviderStateMixin {
-  User? driverData;
+  //User? driverData;
+  UserData? driverData;
   bool isLoading = true;
   
   late AnimationController _animationController;
@@ -61,29 +65,30 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
   }
 
   Future<void> _loadDriverData() async {
-    try {
-      final data = await DashboardRepository().getUserData();
-      setState(() {
-        driverData = data;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        driverData = User(
-          id: 'fallback',
-          name: 'Driver',
-          email: 'driver@sepesha.com',
-          phone: '+255000000000',
-          vehicleNumber: 'N/A',
-          vehicleType: 'Car',
-          walletBalance: 0.0,
-          rating: 0.0,
-          totalRides: 0,
-        );
-      });
-    }
+  try {
+    // Use UserProfileRepository instead of DashboardRepository
+    final profileData = await UserProfileRepository().getUserProfile();
+    setState(() {
+      driverData = profileData?['user'] as UserData?;
+      isLoading = false;
+    });
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+      driverData = UserData(
+        firstName: 'Driver',
+        lastName: 'User',
+        phoneNumber: '+255000000000',
+        email: 'driver@sepesha.com',
+        password: '',
+        userType: 'driver',
+        regionId: 1,
+        profilePhotoUrl: null,
+        isVerified: false,
+      );
+    });
   }
+}
 
   @override
   void dispose() {
@@ -263,12 +268,20 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                         backgroundColor: AppColor.white,
                         child: CircleAvatar(
                           radius: 38,
-                          backgroundColor: AppColor.white,
-                          child: Icon(
-                            Icons.person_rounded,
-                            size: 45,
-                            color: AppColor.primary,
-                          ),
+                          backgroundColor: AppColor.primary.withOpacity(0.1),
+                          backgroundImage: driverData?.profilePhotoUrl != null
+                              ? NetworkImage(driverData!.profilePhotoUrl!)
+                              : null,
+                          child: driverData?.profilePhotoUrl == null
+                              ? Text(
+                                  _getDriverInitials(),
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColor.primary,
+                                  ),
+                                )
+                              : null,
                         ),
                       ),
                     ),
@@ -281,7 +294,7 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          driverData?.name ?? 'Driver',
+                          '${driverData?.firstName ?? 'Driver'} ${driverData?.lastName ?? ''}',
                           style: AppTextStyle.heading2(AppColor.white).copyWith(
                             fontWeight: FontWeight.w700,
                             shadows: [
@@ -289,23 +302,6 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                                 color: Colors.black.withValues(alpha: 0.3),
                                 offset: const Offset(0, 2),
                                 blurRadius: 4,
-                              ),
-                            ],
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          driverData?.email ?? 'driver@sepesha.com',
-                          style: AppTextStyle.paragraph2(
-                            AppColor.white.withValues(alpha: 0.9),
-                          ).copyWith(
-                            shadows: [
-                              Shadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                offset: const Offset(0, 1),
-                                blurRadius: 2,
                               ),
                             ],
                           ),
@@ -327,7 +323,7 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                                 ),
                               ),
                               child: Text(
-                                'DRIVER',
+                                (driverData?.isVerified ?? false) ? 'VERIFIED' : 'UNVERIFIED',
                                 style: AppTextStyle.caption(AppColor.white).copyWith(
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.5,
@@ -348,7 +344,7 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                                   Icon(Icons.star, color: Colors.amber, size: 16),
                                   const SizedBox(width: 4),
                                   Text(
-                                    driverData?.rating.toStringAsFixed(1) ?? '0.0',
+                                    driverData?.averageRating?.toStringAsFixed(1) ?? '0.0',
                                     style: AppTextStyle.caption(AppColor.white).copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -431,7 +427,7 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
             child: Column(
               children: [
                 Text(
-                  'TZS ${driverData?.walletBalance.toStringAsFixed(0) ?? '0'}',
+                  'TZS ${walletBalance.toStringAsFixed(2)}',
                   style: AppTextStyle.heading3(Colors.green).copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -458,7 +454,7 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                     Icon(Icons.star, color: Colors.amber, size: 20),
                     const SizedBox(width: 4),
                     Text(
-                      driverData?.rating.toStringAsFixed(1) ?? '0.0',
+                      rating.toStringAsFixed(1),
                       style: AppTextStyle.heading3(AppColor.blackText).copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -527,7 +523,7 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    driverData?.vehicleType ?? 'N/A',
+                    vehicleType,
                     style: AppTextStyle.paragraph2(AppColor.blackText).copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -543,7 +539,7 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    driverData?.vehicleNumber ?? 'N/A',
+                    vehicleNumber,
                     style: AppTextStyle.paragraph2(AppColor.blackText).copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -766,5 +762,43 @@ class _NewDriverAccountScreenState extends State<NewDriverAccountScreen> with Ti
         );
       },
     );
+  }
+
+  String _getDriverInitials() {
+    final firstName = driverData?.firstName ?? 'D';
+    final lastName = driverData?.lastName ?? '';
+    
+    if (firstName.isNotEmpty && lastName.isNotEmpty) {
+      return '${firstName[0]}${lastName[0]}'.toUpperCase();
+    } else if (firstName.isNotEmpty) {
+      return firstName[0].toUpperCase();
+    }
+    return 'D';
+  }
+
+  String get vehicleNumber {
+    try {
+      final vehicle = SessionManager.instance.vehicle;
+      return vehicle?.plateNumber ?? 'N/A';
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+
+  String get vehicleType {
+    try {
+      final vehicle = SessionManager.instance.vehicle;
+      return '${vehicle?.manufacturer ?? 'Car'} ${vehicle?.model ?? ''}'.trim();
+    } catch (e) {
+      return 'Car';
+    }
+  }
+
+  double get walletBalance {
+    return driverData?.walletBalanceTzs ?? 0.0;
+  }
+
+  double get rating {
+    return driverData?.averageRating ?? 0.0;
   }
 }

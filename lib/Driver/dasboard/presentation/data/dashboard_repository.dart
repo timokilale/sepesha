@@ -36,6 +36,7 @@ class DashboardRepository {
         walletBalance: 0.0, // This would come from wallet API
         rating: 4.5, // This would come from driver rating API
         totalRides: 0, // This would come from booking history API
+        isVerified: false,
       );
     } catch (e) {
       debugPrint('Error getting user data from session: $e');
@@ -50,6 +51,7 @@ class DashboardRepository {
         walletBalance: 0.0,
         rating: 0.0,
         totalRides: 0,
+        isVerified: false,
       );
     }
   }
@@ -66,6 +68,7 @@ class DashboardRepository {
       walletBalance: 0.0, // Would need wallet endpoint
       rating: 4.5, // Would need rating endpoint
       totalRides: 0, // Would need booking history count
+      isVerified: false,
     );
   }
 
