@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Business Tracker</title>
+  <title>Welcome</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
   <div class="max-w-3xl mx-auto p-8">
     <header class="text-center mb-10">
-      <h1 class="text-3xl font-bold text-gray-800">Business Tracker</h1>
-      <p class="text-gray-600 mt-2">Track purchases, sales, and profit with a clean dashboard.</p>
+      <div class="flex justify-center mb-3">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10 w-auto" />
+      </div>
+      <p class="text-gray-600 mt-2">Track purchases, sales, and profit with a clean interface.</p>
     </header>
 
     <div class="bg-white rounded shadow p-6">

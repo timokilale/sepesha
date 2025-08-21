@@ -10,17 +10,20 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            return redirect()->route('home');
         }
         return view('auth.login');
     }
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
+        $validated = $request->validate([
+            // Allow numbers starting with 255 followed by 9 digits OR 0 followed by 8 digits
+            'phone' => ['required','regex:/^(?:255\d{9}|0\d{8})$/'],
+            'password' => ['required','string'],
         ]);
+
+        $credentials = ['phone' => $validated['phone'], 'password' => $validated['password']];
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             // Regenerate session ID and bind it as the user's active session
@@ -29,12 +32,12 @@ class AuthController extends Controller
             $user->current_session_id = $request->session()->getId();
             $user->save();
 
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('home'));
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+            'phone' => 'The provided credentials do not match our records.',
+        ])->onlyInput('phone');
     }
 
     public function logout(Request $request)

@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Business Tracker') }}</title>
+    <title>{{ config('app.name', 'Kashier') }}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- Fonts: Raleway -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,25 +21,25 @@
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="font-sans antialiased bg-gray-100">
+<body class="antialiased bg-gray-50" style="font-family: 'Raleway', sans-serif;">
     <div class="min-h-screen">
         <!-- Navigation -->
-        <nav class="bg-white shadow-lg">
+        <nav class="bg-white border-b">
             <div class="max-w-7xl mx-auto px-4">
-                <div class="flex justify-between h-16">
+                <div class="flex justify-between h-14">
                     <div class="flex">
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
-                            <a href="{{ route('dashboard') }}" class="text-xl font-bold text-gray-800">
-                                Business Tracker
+                            <a href="{{ route('home') }}" class="inline-flex items-center">
+                                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-8 w-auto" />
                             </a>
                         </div>
 
                         <!-- Navigation Links -->
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <a href="{{ route('dashboard') }}" 
-                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('dashboard') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
-                                Dashboard
+                            <a href="{{ route('home') }}" 
+                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('home') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
+                                Home
                             </a>
                             <a href="{{ route('purchases.index') }}" 
                                class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('purchases.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
@@ -48,11 +49,18 @@
                                class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('sales.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
                                 Sales
                             </a>
+                            <a href="{{ route('charts.index') }}" 
+                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('charts.index') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
+                                Charts
+                            </a>
                         </div>
                     </div>
 
+                    <!-- Quick Add removed (available on Home) -->
+                    <div class="hidden sm:flex items-center gap-2 mr-3"></div>
+
                     <!-- User Menu -->
-                    <div class="hidden sm:flex sm:items-center sm:ml-6">
+                    <div class="hidden sm:flex sm:items-center sm:ml-0">
                         <div class="ml-3 relative" x-data="{ open: false }">
                             <div>
                                 <button @click="open = !open" class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -64,13 +72,10 @@
                             </div>
 
                             <div x-show="open" @click.away="open = false" 
-                                 class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                 class="origin-top-right absolute right-0 mt-2 w-48 rounded-md bg-white border z-50">
                                 <div class="py-1">
-                                    <div class="px-4 py-2 text-sm text-gray-700 border-b">
-                                        {{ Auth::user()->name }}
-                                    </div>
-                                    <a href="{{ route('password.edit') }}" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        Change Password
+                                    <a href="{{ route('profile.edit') }}" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Profile
                                     </a>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
@@ -83,22 +88,20 @@
                         </div>
                     </div>
 
-                    <!-- Mobile menu button -->
-                    <div class="-mr-2 flex items-center sm:hidden" x-data="{ open: false }">
-                        <button @click="open = !open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500">
-                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                <path :class="{'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                <path :class="{'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                    <!-- Menu button (mobile) -->
+                    <div class="-mr-2 flex items-center gap-2 sm:hidden" x-data="{ open: false }">
+                        <button @click="open = !open" class="inline-flex items-center justify-center px-3 py-1.5 rounded-md border text-sm text-gray-700 hover:bg-gray-100 focus:outline-none">
+                            Menu
                         </button>
                         
                         <!-- Mobile menu -->
                         <div x-show="open" @click.away="open = false" 
-                             class="absolute top-16 right-4 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                             class="absolute top-14 right-4 mt-2 w-48 rounded-md bg-white border z-50">
                             <div class="py-1">
-                                <a href="{{ route('dashboard') }}" 
-                                   class="block px-4 py-2 text-sm {{ request()->routeIs('dashboard') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
-                                    Dashboard
+                                <!-- Business management -->
+                                <a href="{{ route('home') }}" 
+                                   class="block px-4 py-2 text-sm {{ request()->routeIs('home') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
+                                    Home
                                 </a>
                                 <a href="{{ route('purchases.index') }}" 
                                    class="block px-4 py-2 text-sm {{ request()->routeIs('purchases.*') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
@@ -108,12 +111,15 @@
                                    class="block px-4 py-2 text-sm {{ request()->routeIs('sales.*') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
                                     Sales
                                 </a>
-                                <div class="border-t border-gray-100"></div>
-                                <div class="px-4 py-2 text-sm text-gray-700 border-b">
-                                    {{ Auth::user()->name }}
-                                </div>
-                                <a href="{{ route('password.edit') }}" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    Change Password
+                                <a href="{{ route('charts.index') }}" 
+                                   class="block px-4 py-2 text-sm {{ request()->routeIs('charts.index') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
+                                    Charts
+                                </a>
+                                <div class="border-t border-gray-200 my-1"></div>
+                                <!-- Profile / auth -->
+                                <a href="{{ route('profile.edit') }}" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Profile
                                 </a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
@@ -129,19 +135,26 @@
         </nav>
 
         <!-- Page Content -->
-        <main class="py-6">
+        <main class="py-5">
+            <style>
+              :root {
+                --radius: 0.375rem; /* rounded */
+                --sep: 1px solid #e5e7eb; /* gray-200 */
+              }
+              table.data-table tbody tr:hover { background-color: #f9fafb; } /* gray-50 */
+            </style>
             @if (session('success'))
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                        <span class="block sm:inline">{{ session('success') }}</span>
+                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                    <div class="flex items-center gap-2 border-l-4 border-green-500 bg-green-50 text-green-700 px-3 py-2" role="alert">
+                        <span class="text-sm">{{ session('success') }}</span>
                     </div>
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                        <span class="block sm:inline">{{ session('error') }}</span>
+                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                    <div class="flex items-center gap-2 border-l-4 border-red-500 bg-red-50 text-red-700 px-3 py-2" role="alert">
+                        <span class="text-sm">{{ session('error') }}</span>
                     </div>
                 </div>
             @endif

@@ -10,12 +10,20 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        if (!User::where('email', 'admin@example.com')->exists()) {
+        $admin = User::where('email', 'admin@example.com')->first();
+        if (!$admin) {
             User::create([
                 'name' => 'Admin',
                 'email' => 'admin@example.com',
+                'phone' => '255714609135',
                 'password' => Hash::make('password123'),
             ]);
+        } else {
+            // Ensure phone is set
+            if (!$admin->phone) {
+                $admin->phone = '255714609135';
+                $admin->save();
+            }
         }
     }
 }

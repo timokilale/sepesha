@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto px-4">
-  <h1 class="text-2xl font-bold text-gray-800 mb-4">Add Purchase</h1>
+  <h1 class="text-xl font-semibold text-gray-900 mb-3">Add Purchase</h1>
 
-  <div class="bg-white rounded shadow p-6">
+  <div class="bg-white rounded border p-4">
     <form method="POST" action="{{ route('purchases.store') }}" class="space-y-4">
       @csrf
       <div>
@@ -35,8 +35,8 @@
         @error('description')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
       </div>
       <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-        <button class="px-4 py-2 bg-indigo-600 text-white rounded">Save</button>
-        <a href="{{ route('purchases.index') }}" class="px-4 py-2 bg-gray-100 rounded text-center">Cancel</a>
+        <button class="px-3 py-2 bg-indigo-600 text-white rounded">Save</button>
+        <a href="{{ route('purchases.index') }}" class="px-3 py-2 bg-gray-100 rounded text-center">Cancel</a>
       </div>
     </form>
   </div>

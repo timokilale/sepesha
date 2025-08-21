@@ -1,4 +1,4 @@
-# Business Tracker (Laravel)
+# Kashier (Laravel)
 
 A simple full-stack web app to track purchases and sales with a clean dashboard, profit/loss analytics, and charts. Built with Laravel, Blade + Tailwind CSS, and MySQL by default.
 

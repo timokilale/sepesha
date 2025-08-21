@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto px-4">
-  <h1 class="text-2xl font-bold text-gray-800 mb-4">Edit Purchase</h1>
+  <h1 class="text-xl font-semibold text-gray-900 mb-3">Edit Purchase</h1>
 
-  <div class="bg-white rounded shadow p-6">
+  <div class="bg-white rounded border p-4">
     <form method="POST" action="{{ route('purchases.update', $purchase) }}" class="space-y-4">
       @csrf
       @method('PUT')
@@ -31,8 +31,8 @@
         <textarea name="description" class="w-full border rounded px-3 py-2" rows="3">{{ old('description', $purchase->description) }}</textarea>
       </div>
       <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-        <button class="px-4 py-2 bg-indigo-600 text-white rounded">Update</button>
-        <a href="{{ route('purchases.index') }}" class="px-4 py-2 bg-gray-100 rounded text-center">Cancel</a>
+        <button class="px-3 py-2 bg-indigo-600 text-white rounded">Update</button>
+        <a href="{{ route('purchases.index') }}" class="px-3 py-2 bg-gray-100 rounded text-center">Cancel</a>
       </div>
     </form>
   </div>

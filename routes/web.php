@@ -5,6 +5,8 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ChartController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,10 +20,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Root: redirect guests to login, authenticated users to dashboard
+// Root: redirect guests to login, authenticated users to home
 Route::get('/', function () {
     return auth()->check()
-        ? redirect()->route('dashboard')
+        ? redirect()->route('home')
         : redirect()->route('login');
 });
 
@@ -32,8 +34,12 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-// Dashboard
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth','single.session'])->name('dashboard');
+// Home (formerly Dashboard)
+Route::get('/home', [DashboardController::class, 'index'])->middleware(['auth','single.session'])->name('home');
+// Backward compatibility: redirect /dashboard to /home
+Route::get('/dashboard', function () {
+    return redirect()->route('home');
+})->middleware(['auth','single.session']);
 
 // Purchases
 Route::resource('purchases', PurchaseController::class)->middleware(['auth','single.session']);
@@ -47,8 +53,15 @@ Route::middleware(['auth','single.session'])->group(function () {
     Route::post('/password', [PasswordController::class, 'update'])->name('password.update');
 });
 
-// Redirect authenticated users to dashboard
-Route::get('/home', function () {
-    return redirect()->route('dashboard');
-})->name('home');
+// Profile (update name, phone, email)
+Route::middleware(['auth','single.session'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
 
+// Charts (date-range analytics)
+Route::middleware(['auth','single.session'])->group(function () {
+    Route::get('/charts', [ChartController::class, 'index'])->name('charts.index');
+});
+
+// (removed old /home redirect block)

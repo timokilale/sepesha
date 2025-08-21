@@ -28,6 +28,6 @@ class PasswordController extends Controller
         $user->current_session_id = $request->session()->getId();
         $user->save();
 
-        return redirect()->route('dashboard')->with('success', 'Password updated successfully.');
+        return redirect()->route('home')->with('success', 'Password updated successfully.');
     }
 }

@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Business Tracker</title>
+  <title>Login</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
   <div class="w-full max-w-md bg-white p-8 rounded shadow">
+    <div class="flex justify-center mb-6">
+      <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10 w-auto" />
+    </div>
     <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Sign in</h1>
 
     @if ($errors->any())
@@ -21,8 +24,9 @@
       @csrf
 
       <div>
-        <label class="block text-sm text-gray-700 mb-1">Email</label>
-        <input type="email" name="email" value="{{ old('email') }}" required autofocus class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <label class="block text-sm text-gray-700 mb-1">Phone</label>
+        <input type="tel" name="phone" value="{{ old('phone') }}" required autofocus pattern="^(?:255\d{9}|0\d{8})$" placeholder="e.g. 255714609135" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        @error('phone')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
       </div>
 
       <div>
@@ -33,6 +37,7 @@
             <span x-text="show ? 'Hide' : 'Show'"></span>
           </button>
         </div>
+        @error('password')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
       </div>
 
       <div class="flex items-center justify-between">
