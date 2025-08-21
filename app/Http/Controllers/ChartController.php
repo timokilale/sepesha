@@ -59,11 +59,39 @@ class ChartController extends Controller
             'end_date' => $endDate->toDateString(),
         ];
 
+        // Compute dataset bounds (after arrays are populated)
+        $allValues = array_merge($purchases, $sales);
+        $dataMin = !empty($allValues) ? (float) min($allValues) : 0.0;
+        $dataMax = !empty($allValues) ? (float) max($allValues) : 0.0;
+
+        // Optional Y axis bounds
+        $yMin = $request->filled('y_min') && is_numeric($request->input('y_min'))
+            ? (float) $request->input('y_min')
+            : null;
+        $yMax = $request->filled('y_max') && is_numeric($request->input('y_max'))
+            ? (float) $request->input('y_max')
+            : null;
+
+        // Safety: if both provided and out of order, swap
+        if ($yMin !== null && $yMax !== null && $yMin > $yMax) {
+            [$yMin, $yMax] = [$yMax, $yMin];
+        }
+
+        // Effective scale the chart will use
+        $currentMin = $yMin !== null ? $yMin : 0.0; // we use beginAtZero when unset
+        $currentMax = $yMax !== null ? $yMax : $dataMax;
+
         return view('charts.index', [
             'labels' => $labels,
             'purchases' => $purchases,
             'sales' => $sales,
             'range' => $range,
+            'yMin' => $yMin,
+            'yMax' => $yMax,
+            'dataMin' => $dataMin,
+            'dataMax' => $dataMax,
+            'currentMin' => $currentMin,
+            'currentMax' => $currentMax,
         ]);
     }
 }

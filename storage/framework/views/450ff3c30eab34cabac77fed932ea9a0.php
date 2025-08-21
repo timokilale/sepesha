@@ -1,10 +1,23 @@
 <?php $__env->startSection('content'); ?>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-between mb-4">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ open: false }">
+  <div class="flex items-center justify-between mb-2">
     <h1 class="text-lg font-semibold text-gray-800">Charts</h1>
+    <button type="button" @click="open = !open" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border text-sm text-gray-700 hover:bg-gray-100">
+      Filters
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
+    </button>
   </div>
 
-  <form method="GET" action="<?php echo e(route('charts.index')); ?>" class="bg-white border rounded p-4 mb-4 grid grid-cols-1 sm:grid-cols-5 gap-3">
+  <form method="GET" action="<?php echo e(route('charts.index')); ?>" x-show="open" x-transition class="bg-white border rounded p-4 mb-4 grid grid-cols-1 sm:grid-cols-6 gap-3" x-data="{ err: '' }" @submit.prevent="
+      const minVal = parseFloat($refs.ymin.value);
+      const maxVal = parseFloat($refs.ymax.value);
+      const hasMin = !Number.isNaN(minVal);
+      const hasMax = !Number.isNaN(maxVal);
+      if (hasMin && hasMax && minVal > maxVal) { err = 'Start amount cannot be greater than End amount.'; return; }
+      err = '';
+      open = false;
+      $nextTick(() => $el.submit());
+    ">
     <div class="sm:col-span-2">
       <label class="block text-xs text-gray-600 mb-1">Start date</label>
       <input type="month" name="start_date" value="<?php echo e(substr($range['start_date'],0,7)); ?>" class="w-full border rounded px-3 py-2" />
@@ -13,8 +26,24 @@
       <label class="block text-xs text-gray-600 mb-1">End date</label>
       <input type="month" name="end_date" value="<?php echo e(substr($range['end_date'],0,7)); ?>" class="w-full border rounded px-3 py-2" />
     </div>
-    <div class="sm:col-span-1 flex items-end">
-      <button class="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Apply</button>
+    <div class="sm:col-span-1">
+      <label class="block text-xs text-gray-600 mb-1">Start amount</label>
+      <input x-ref="ymin" type="number" step="0.01" name="y_min" value="<?php echo e($yMin !== null ? $yMin : ''); ?>" placeholder="<?php echo e(number_format($currentMin, 2, '.', ',')); ?>" class="w-full border rounded px-3 py-2" />
+      <p class="mt-1 text-[11px] text-gray-500">Current start: <?php echo e(number_format($currentMin, 2, '.', ',')); ?> | Data min: <?php echo e(number_format($dataMin, 2, '.', ',')); ?></p>
+    </div>
+    <div class="sm:col-span-1">
+      <label class="block text-xs text-gray-600 mb-1">End amount</label>
+      <input x-ref="ymax" type="number" step="0.01" name="y_max" value="<?php echo e($yMax !== null ? $yMax : ''); ?>" placeholder="<?php echo e(number_format($currentMax, 2, '.', ',')); ?>" class="w-full border rounded px-3 py-2" />
+      <p class="mt-1 text-[11px] text-gray-500">Current end: <?php echo e(number_format($currentMax, 2, '.', ',')); ?> | Data max: <?php echo e(number_format($dataMax, 2, '.', ',')); ?></p>
+    </div>
+    <div class="sm:col-span-6">
+      <template x-if="err">
+        <div class="mb-2 text-sm text-red-600"><?php echo e('{'); ?>{ err }<?php echo e('}'); ?></div>
+      </template>
+      <div class="flex items-center justify-end gap-2">
+        <a href="<?php echo e(route('charts.index')); ?>" class="px-4 py-2 border rounded text-sm text-gray-700 hover:bg-gray-50">Reset</a>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Apply</button>
+      </div>
     </div>
   </form>
 
@@ -26,6 +55,8 @@
 
 <script>
   const ctx = document.getElementById('rangeChart').getContext('2d');
+  const yMin = <?php echo json_encode($yMin, 15, 512) ?>;
+  const yMax = <?php echo json_encode($yMax, 15, 512) ?>;
   new Chart(ctx, {
     type: 'bar',
     data: {
@@ -35,7 +66,16 @@
         { label: 'Sales', backgroundColor: '#22c55e', data: <?php echo json_encode($sales, 15, 512) ?> }
       ]
     },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: yMin === null && yMax === null,
+          min: yMin ?? undefined,
+          max: yMax ?? undefined,
+        }
+      }
+    }
   });
 </script>
 <?php $__env->stopSection(); ?>
