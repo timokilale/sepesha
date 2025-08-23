@@ -10,11 +10,11 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'admin@example.com')->first();
+        $admin = User::where('email', 'mimi@mimi.com')->first();
         if (!$admin) {
             User::create([
                 'name' => 'Admin',
-                'email' => 'admin@example.com',
+                'email' => 'mimi@mimi.com',
                 'phone' => '255714609135',
                 'password' => Hash::make('password123'),
             ]);

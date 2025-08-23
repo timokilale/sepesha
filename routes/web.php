@@ -7,6 +7,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChartController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,6 +50,12 @@ Route::resource('purchases', PurchaseController::class)->middleware(['auth','sin
 // Sales
 Route::resource('sales', SaleController::class)->middleware(['auth','single.session']);
 
+// Items (catalog)
+Route::resource('items', ItemController::class)->middleware(['auth','single.session']);
+
+// Expenses (operating costs)
+Route::resource('expenses', ExpenseController::class)->middleware(['auth','single.session']);
+
 // Password (Change Password)
 Route::middleware(['auth','single.session'])->group(function () {
     Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
@@ -62,6 +71,7 @@ Route::middleware(['auth','single.session'])->group(function () {
 // Charts (date-range analytics)
 Route::middleware(['auth','single.session'])->group(function () {
     Route::get('/charts', [ChartController::class, 'index'])->name('charts.index');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
 // (removed old /home redirect block)

@@ -16,11 +16,17 @@ class Purchase extends Model
      */
     protected $fillable = [
         'user_id',
+        'item_id',
         'item_name',
         'cost_price',
         'purchase_date',
         'description',
         'quantity',
+        // packaging fields
+        'cartons',
+        'loose_units',
+        'units_per_carton',
+        'carton_cost',
     ];
 
     /**
@@ -39,6 +45,14 @@ class Purchase extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Optional related item (catalog entry)
+     */
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
     }
 
     /**
@@ -66,6 +80,22 @@ class Purchase extends Model
     }
 
     /**
+     * Computed: total units for this purchase (for convenience)
+     */
+    public function getTotalUnitsAttribute()
+    {
+        return (int) $this->quantity;
+    }
+
+    /**
+     * Computed: unit cost. We keep `cost_price` as unit cost for compatibility.
+     */
+    public function getUnitCostAttribute()
+    {
+        return (float) $this->cost_price;
+    }
+
+    /**
      * Get the total revenue from sales of this purchase.
      */
     public function getTotalRevenueAttribute()
@@ -80,7 +110,7 @@ class Purchase extends Model
      */
     public function getProfitLossAttribute()
     {
-        $totalCost = $this->cost_price * $this->total_quantity_sold;
+        $totalCost = $this->unit_cost * $this->total_quantity_sold;
         return $this->total_revenue - $totalCost;
     }
 }

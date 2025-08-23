@@ -7,20 +7,32 @@
   <div class="bg-white rounded border p-4">
     <form method="POST" action="{{ route('purchases.store') }}" class="space-y-4">
       @csrf
-      <div>
-        <label class="block text-sm text-gray-700 mb-1">Item name</label>
-        <input name="item_name" value="{{ old('item_name') }}" class="w-full border rounded px-3 py-2" required />
-        @error('item_name')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Item (optional)</label>
+          <select name="item_id" class="w-full border rounded px-3 py-2">
+            <option value="">-- Select item --</option>
+            @foreach($items as $item)
+              <option value="{{ $item->id }}" @selected(old('item_id')==$item->id)>{{ $item->name }}</option>
+            @endforeach
+          </select>
+          @error('item_id')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Or item name</label>
+          <input name="item_name" value="{{ old('item_name') }}" class="w-full border rounded px-3 py-2" placeholder="e.g., Coca-Cola" />
+          @error('item_name')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
+        </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label class="block text-sm text-gray-700 mb-1">Cost price</label>
-          <input type="number" step="0.01" name="cost_price" value="{{ old('cost_price') }}" class="w-full border rounded px-3 py-2" required />
+          <label class="block text-sm text-gray-700 mb-1">Unit cost (optional)</label>
+          <input type="number" step="0.01" name="cost_price" value="{{ old('cost_price') }}" class="w-full border rounded px-3 py-2" />
           @error('cost_price')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
         </div>
         <div>
-          <label class="block text-sm text-gray-700 mb-1">Quantity</label>
-          <input type="number" min="1" name="quantity" value="{{ old('quantity',1) }}" class="w-full border rounded px-3 py-2" required />
+          <label class="block text-sm text-gray-700 mb-1">Units (optional)</label>
+          <input type="number" min="1" name="quantity" value="{{ old('quantity') }}" class="w-full border rounded px-3 py-2" />
           @error('quantity')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
         </div>
         <div>
@@ -28,6 +40,33 @@
           <input type="date" name="purchase_date" value="{{ old('purchase_date') }}" class="w-full border rounded px-3 py-2" required />
           @error('purchase_date')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
         </div>
+      </div>
+
+      <div class="border rounded p-3">
+        <h2 class="text-sm font-semibold text-gray-800 mb-2">Packaging (optional)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Cartons</label>
+            <input type="number" min="0" name="cartons" value="{{ old('cartons', 0) }}" class="w-full border rounded px-3 py-2" />
+            @error('cartons')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Units/carton</label>
+            <input type="number" min="1" name="units_per_carton" value="{{ old('units_per_carton') }}" class="w-full border rounded px-3 py-2" />
+            @error('units_per_carton')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Loose units</label>
+            <input type="number" min="0" name="loose_units" value="{{ old('loose_units', 0) }}" class="w-full border rounded px-3 py-2" />
+            @error('loose_units')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Carton cost</label>
+            <input type="number" step="0.01" min="0" name="carton_cost" value="{{ old('carton_cost') }}" class="w-full border rounded px-3 py-2" />
+            @error('carton_cost')<p class="text-red-600 text-sm">{{ $message }}</p>@enderror
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">If you fill cartons + units/carton (+ optional loose units), total units and per-unit cost will be computed. Leave them blank to manually enter Units and Unit cost.</p>
       </div>
       <div>
         <label class="block text-sm text-gray-700 mb-1">Description</label>
