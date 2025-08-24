@@ -33,14 +33,17 @@ class ChartController extends Controller
         $labels = [];
         $purchases = [];
         $sales = [];
+        $expenses = [];
 
         foreach ($period as $month) {
             $labels[] = $month->format('M Y');
 
+            // Purchases: unit cost × quantity for the month
             $monthlyPurchases = (float) $user->purchases()
                 ->whereYear('purchase_date', $month->year)
                 ->whereMonth('purchase_date', $month->month)
-                ->sum('cost_price');
+                ->get(['cost_price','quantity'])
+                ->sum(function ($p) { return (float) $p->cost_price * (int) $p->quantity; });
 
             $monthlySales = (float) $user->sales()
                 ->whereYear('sale_date', $month->year)
@@ -50,8 +53,15 @@ class ChartController extends Controller
                     return (float) $sale->selling_price * (int) $sale->quantity_sold;
                 });
 
+            // Expenses: sum of expense amounts for the month
+            $monthlyExpenses = (float) $user->expenses()
+                ->whereYear('expense_date', $month->year)
+                ->whereMonth('expense_date', $month->month)
+                ->sum('amount');
+
             $purchases[] = $monthlyPurchases;
             $sales[] = $monthlySales;
+            $expenses[] = $monthlyExpenses;
         }
 
         $range = [
@@ -60,7 +70,7 @@ class ChartController extends Controller
         ];
 
         // Compute dataset bounds (after arrays are populated)
-        $allValues = array_merge($purchases, $sales);
+        $allValues = array_merge($purchases, $sales, $expenses);
         $dataMin = !empty($allValues) ? (float) min($allValues) : 0.0;
         $dataMax = !empty($allValues) ? (float) max($allValues) : 0.0;
 
@@ -85,6 +95,7 @@ class ChartController extends Controller
             'labels' => $labels,
             'purchases' => $purchases,
             'sales' => $sales,
+            'expenses' => $expenses,
             'range' => $range,
             'yMin' => $yMin,
             'yMax' => $yMax,

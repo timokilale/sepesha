@@ -11,12 +11,16 @@
         <div class="font-medium text-gray-900">{{ $purchase->item_name }}</div>
       </div>
       <div>
-        <div class="text-gray-500 text-sm">Cost Price</div>
-        <div class="font-medium text-gray-900">${{ number_format($purchase->cost_price, 2) }}</div>
+        <div class="text-gray-500 text-sm">Unit cost</div>
+        <div class="font-medium text-gray-900">TZS {{ number_format($purchase->cost_price, 2) }}</div>
       </div>
       <div>
         <div class="text-gray-500 text-sm">Quantity</div>
         <div class="font-medium text-gray-900">{{ $purchase->quantity }}</div>
+      </div>
+      <div>
+        <div class="text-gray-500 text-sm">Total</div>
+        <div class="font-medium text-gray-900">TZS {{ number_format($purchase->cost_price * $purchase->quantity, 2) }}</div>
       </div>
       <div>
         <div class="text-gray-500 text-sm">Purchase Date</div>

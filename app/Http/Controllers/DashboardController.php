@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Purchase;
 use App\Models\Sale;
+use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -26,13 +27,19 @@ class DashboardController extends Controller
         $user = Auth::user();
         
         // Get analytics data
-        $totalPurchases = (float) $user->purchases()->sum('cost_price');
-        // Compute total sales as price * quantity across all user sales
+        // Purchases: unit cost × quantity across all purchases
+        $totalPurchases = (float) $user->purchases()->get(['cost_price','quantity'])->sum(function ($p) {
+            return (float) $p->cost_price * (int) $p->quantity;
+        });
+        // Sales: price × quantity across all sales
         $totalSales = (float) $user->sales()->select('selling_price', 'quantity_sold')->get()
             ->sum(function ($sale) {
                 return (float) $sale->selling_price * (int) $sale->quantity_sold;
             });
-        $totalProfit = $totalSales - $totalPurchases;
+        // Expenses: sum of expense amounts
+        $totalExpenses = (float) $user->expenses()->sum('amount');
+        // Profit: sales − purchases − expenses
+        $totalProfit = $totalSales - $totalPurchases - $totalExpenses;
         
         // Get recent purchases and sales
         $recentPurchases = $user->purchases()
@@ -48,6 +55,16 @@ class DashboardController extends Controller
         
         // Get monthly data for charts
         $monthlyData = $this->getMonthlyData($user);
+
+        // Products for homepage grid
+        $items = \App\Models\Item::where('user_id', $user->id)->with(['purchases.sales'])->orderBy('name')->get();
+        // Compute stock per item
+        $items = $items->map(function ($item) {
+            $purchased = (int) $item->purchases->sum('quantity');
+            $sold = (int) $item->purchases->flatMap->sales->sum('quantity_sold');
+            $item->stock_remaining = max(0, $purchased - $sold);
+            return $item;
+        });
         
         return view('dashboard', compact(
             'totalPurchases',
@@ -55,7 +72,8 @@ class DashboardController extends Controller
             'totalProfit',
             'recentPurchases',
             'recentSales',
-            'monthlyData'
+            'monthlyData',
+            'items'
         ));
     }
     

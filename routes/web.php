@@ -38,40 +38,86 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Home (formerly Dashboard)
-Route::get('/home', [DashboardController::class, 'index'])->middleware(['auth','single.session'])->name('home');
+Route::get('/home', [DashboardController::class, 'index'])->middleware(['auth'])->name('home');
 // Backward compatibility: redirect /dashboard to /home
 Route::get('/dashboard', function () {
     return redirect()->route('home');
-})->middleware(['auth','single.session']);
+})->middleware(['auth']);
 
 // Purchases
-Route::resource('purchases', PurchaseController::class)->middleware(['auth','single.session']);
+Route::resource('purchases', PurchaseController::class)->middleware(['auth']);
+
+// Single-segment alternatives for Purchases
+Route::middleware(['auth'])->group(function () {
+    Route::get('/purchase-{id}', [PurchaseController::class, 'show'])->whereNumber('id')->name('purchases.show.single');
+    Route::get('/purchase-{id}-edit', [PurchaseController::class, 'edit'])->whereNumber('id')->name('purchases.edit.single');
+    Route::put('/purchase-{id}', [PurchaseController::class, 'update'])->whereNumber('id')->name('purchases.update.single');
+    Route::patch('/purchase-{id}', [PurchaseController::class, 'update'])->whereNumber('id');
+    Route::delete('/purchase-{id}-delete', [PurchaseController::class, 'destroy'])->whereNumber('id')->name('purchases.destroy.single');
+});
 
 // Sales
-Route::resource('sales', SaleController::class)->middleware(['auth','single.session']);
+Route::resource('sales', SaleController::class)->middleware(['auth']);
+
+// Single-segment alternatives for Sales
+Route::middleware(['auth'])->group(function () {
+    Route::get('/sale-{id}', [SaleController::class, 'show'])->whereNumber('id')->name('sales.show.single');
+    Route::get('/sale-{id}-edit', [SaleController::class, 'edit'])->whereNumber('id')->name('sales.edit.single');
+    Route::put('/sale-{id}', [SaleController::class, 'update'])->whereNumber('id')->name('sales.update.single');
+    Route::patch('/sale-{id}', [SaleController::class, 'update'])->whereNumber('id');
+    Route::delete('/sale-{id}-delete', [SaleController::class, 'destroy'])->whereNumber('id')->name('sales.destroy.single');
+});
 
 // Items (catalog)
-Route::resource('items', ItemController::class)->middleware(['auth','single.session']);
+Route::resource('items', ItemController::class)->middleware(['auth']);
+// Friendly singular alias
+Route::get('/item', function () {
+    return redirect()->route('items.index');
+})->middleware(['auth'])->name('item');
+
+// Single-segment alternatives for Items
+Route::middleware(['auth'])->group(function () {
+    Route::get('/item-{id}', [ItemController::class, 'show'])->whereNumber('id')->name('items.show.single');
+    Route::get('/item-{id}-edit', [ItemController::class, 'edit'])->whereNumber('id')->name('items.edit.single');
+    Route::put('/item-{id}', [ItemController::class, 'update'])->whereNumber('id')->name('items.update.single');
+    Route::patch('/item-{id}', [ItemController::class, 'update'])->whereNumber('id');
+    Route::delete('/item-{id}-delete', [ItemController::class, 'destroy'])->whereNumber('id')->name('items.destroy.single');
+});
 
 // Expenses (operating costs)
-Route::resource('expenses', ExpenseController::class)->middleware(['auth','single.session']);
+Route::resource('expenses', ExpenseController::class)->middleware(['auth']);
+
+// Single-segment alternatives to avoid blocked nested numeric paths
+Route::middleware(['auth'])->group(function () {
+    Route::get('/expense-{id}', [ExpenseController::class, 'show'])->whereNumber('id')->name('expenses.show.single');
+    Route::get('/expense-{id}-edit', [ExpenseController::class, 'edit'])->whereNumber('id')->name('expenses.edit.single');
+    Route::put('/expense-{id}', [ExpenseController::class, 'update'])->whereNumber('id')->name('expenses.update.single');
+    Route::patch('/expense-{id}', [ExpenseController::class, 'update'])->whereNumber('id');
+    Route::delete('/expense-{id}-delete', [ExpenseController::class, 'destroy'])->whereNumber('id')->name('expenses.destroy.single');
+});
 
 // Password (Change Password)
-Route::middleware(['auth','single.session'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::post('/password', [PasswordController::class, 'update'])->name('password.update');
 });
 
 // Profile (update name, phone, email)
-Route::middleware(['auth','single.session'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 // Charts (date-range analytics)
-Route::middleware(['auth','single.session'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/charts', [ChartController::class, 'index'])->name('charts.index');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
 // (removed old /home redirect block)
+
+// Keepalive ping to prevent session expiry (used by layout script)
+Route::get('/ping', function () {
+    // Return 204 No Content for minimal overhead
+    return response('', 204);
+})->middleware(['auth']);

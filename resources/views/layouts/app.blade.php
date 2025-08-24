@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Kashier') }}</title>
+    <title>{{ config('app.name', 'Olomitu') }}</title>
+    <meta name="theme-color" content="#4f46e5" />
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
 
     <!-- Fonts: Raleway -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +33,7 @@
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
                             <a href="{{ route('home') }}" class="inline-flex items-center">
-                                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-8 w-auto" />
+                                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-12 w-auto" />
                             </a>
                         </div>
 
@@ -43,16 +45,25 @@
                             </a>
                             <a href="{{ route('purchases.index') }}" 
                                class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('purchases.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
-                                Purchases
+                                Buy Stock
                             </a>
                             <a href="{{ route('sales.index') }}" 
                                class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('sales.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
-                                Sales
+                                Sell Stock
+                            </a>
+                            <a href="{{ route('item') }}" 
+                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ (request()->routeIs('items.*') || request()->routeIs('item')) ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
+                                Products
                             </a>
                             <a href="{{ route('charts.index') }}" 
                                class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('charts.index') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
-                                Charts
+                                Insights
                             </a>
+                            <a href="{{ route('expenses.index') }}" 
+                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('expenses.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm font-medium">
+                                Expenses
+                            </a>
+                            <button id="install-app-desktop" type="button" class="inline-flex items-center px-2 py-1.5 ml-4 border rounded text-sm text-gray-700 hover:bg-gray-100 hidden">Install Olomitu</button>
                         </div>
                     </div>
 
@@ -105,16 +116,25 @@
                                 </a>
                                 <a href="{{ route('purchases.index') }}" 
                                    class="block px-4 py-2 text-sm {{ request()->routeIs('purchases.*') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
-                                    Purchases
+                                    Buy Stock
                                 </a>
                                 <a href="{{ route('sales.index') }}" 
                                    class="block px-4 py-2 text-sm {{ request()->routeIs('sales.*') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
-                                    Sales
+                                    Sell Stock
+                                </a>
+                                <a href="{{ route('item') }}" 
+                                   class="block px-4 py-2 text-sm {{ (request()->routeIs('items.*') || request()->routeIs('item')) ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
+                                    Products
                                 </a>
                                 <a href="{{ route('charts.index') }}" 
                                    class="block px-4 py-2 text-sm {{ request()->routeIs('charts.index') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
-                                    Charts
+                                    Insights
                                 </a>
+                                <a href="{{ route('expenses.index') }}" 
+                                   class="block px-4 py-2 text-sm {{ request()->routeIs('expenses.*') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100' }}">
+                                    Expenses
+                                </a>
+                                <button id="install-app-mobile" type="button" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hidden">Install Olomitu</button>
                                 <div class="border-t border-gray-200 my-1"></div>
                                 <!-- Profile / auth -->
                                 <a href="{{ route('profile.edit') }}" 
@@ -162,5 +182,58 @@
             @yield('content')
         </main>
     </div>
+<script>
+  // Register service worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('{{ asset('service-worker.js') }}').catch(() => {});
+    });
+  }
+  // Handle PWA install prompt
+  (function installPromptHandler(){
+    let deferredPrompt = null;
+    const btnDesktop = document.getElementById('install-app-desktop');
+    const btnMobile = document.getElementById('install-app-mobile');
+
+    const hideButtons = () => {
+      if (btnDesktop) btnDesktop.classList.add('hidden');
+      if (btnMobile) btnMobile.classList.add('hidden');
+    };
+    const showButtons = () => {
+      if (btnDesktop) btnDesktop.classList.remove('hidden');
+      if (btnMobile) btnMobile.classList.remove('hidden');
+    };
+    // If already installed (standalone), keep hidden
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) hideButtons();
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      showButtons();
+    });
+
+    const triggerInstall = async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch (_) {}
+      deferredPrompt = null;
+      hideButtons();
+    };
+    if (btnDesktop) btnDesktop.addEventListener('click', triggerInstall);
+    if (btnMobile) btnMobile.addEventListener('click', triggerInstall);
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      hideButtons();
+    });
+  })();
+  // Keep session alive to reduce 419 (CSRF/Session expired)
+  (function keepAlive(){
+    const ping = () => fetch('{{ url('/ping') }}', { credentials: 'same-origin', cache: 'no-store' }).catch(() => {});
+    // Ping every 10 minutes
+    setInterval(ping, 10 * 60 * 1000);
+  })();
+</script>
 </body>
 </html>

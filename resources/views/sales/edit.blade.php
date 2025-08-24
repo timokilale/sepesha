@@ -5,7 +5,7 @@
   <h1 class="text-xl font-semibold text-gray-900 mb-3">Edit Sale</h1>
 
   <div class="bg-white rounded border p-4">
-    <form method="POST" action="{{ route('sales.update', $sale) }}" class="space-y-4">
+    <form method="POST" action="{{ route('sales.update.single', ['id' => $sale->id]) }}" class="space-y-4">
       @csrf
       @method('PUT')
       <div>
@@ -24,7 +24,7 @@
           <input type="number" step="0.01" name="selling_price" value="{{ old('selling_price', $sale->selling_price) }}" class="w-full border rounded px-3 py-2" required />
         </div>
         <div>
-          <label class="block text-sm text-gray-700 mb-1">Quantity sold</label>
+          <label class="block text-sm text-gray-700 mb-1">Quantity</label>
           <input type="number" min="1" name="quantity_sold" value="{{ old('quantity_sold', $sale->quantity_sold) }}" class="w-full border rounded px-3 py-2" required />
         </div>
         <div>

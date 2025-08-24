@@ -37,21 +37,21 @@ class ExpenseController extends Controller
         return redirect()->route('expenses.index')->with('success', 'Expense recorded');
     }
 
-    public function show(Expense $expense)
+    public function show($id)
     {
-        abort_if($expense->user_id !== Auth::id(), 403);
+        $expense = Auth::user()->expenses()->findOrFail($id);
         return view('expenses.show', compact('expense'));
     }
 
-    public function edit(Expense $expense)
+    public function edit($id)
     {
-        abort_if($expense->user_id !== Auth::id(), 403);
+        $expense = Auth::user()->expenses()->findOrFail($id);
         return view('expenses.edit', compact('expense'));
     }
 
-    public function update(Request $request, Expense $expense)
+    public function update(Request $request, $id)
     {
-        abort_if($expense->user_id !== Auth::id(), 403);
+        $expense = Auth::user()->expenses()->findOrFail($id);
         $validated = $request->validate([
             'category' => 'required|string|max:100',
             'amount' => 'required|numeric|min:0',
@@ -62,9 +62,9 @@ class ExpenseController extends Controller
         return redirect()->route('expenses.index')->with('success', 'Expense updated');
     }
 
-    public function destroy(Expense $expense)
+    public function destroy($id)
     {
-        abort_if($expense->user_id !== Auth::id(), 403);
+        $expense = Auth::user()->expenses()->findOrFail($id);
         $expense->delete();
         return redirect()->route('expenses.index')->with('success', 'Expense deleted');
     }

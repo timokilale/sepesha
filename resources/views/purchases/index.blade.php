@@ -13,7 +13,7 @@
         <thead class="bg-gray-50">
           <tr>
             <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-            <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cost</th>
+            <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
             <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Qty</th>
             <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Date</th>
             <th class="px-2 sm:px-4 py-2 text-right">Actions</th>
@@ -26,14 +26,17 @@
               <div class="font-medium">{{ $p->item_name }}</div>
               <div class="text-sm text-gray-500 sm:hidden">Qty: {{ $p->quantity }} • {{ $p->purchase_date->format('M d, Y') }}</div>
             </td>
-            <td class="px-2 sm:px-4 py-2 font-medium">${{ number_format($p->cost_price,2) }}</td>
+            <td class="px-2 sm:px-4 py-2">
+              <div class="font-semibold">TZS {{ number_format($p->cost_price * $p->quantity, 2) }}</div>
+              <div class="text-xs text-gray-500">Unit: TZS {{ number_format($p->cost_price, 2) }}</div>
+            </td>
             <td class="px-2 sm:px-4 py-2 hidden sm:table-cell">{{ $p->quantity }}</td>
             <td class="px-2 sm:px-4 py-2 hidden md:table-cell">{{ $p->purchase_date->format('Y-m-d') }}</td>
             <td class="px-2 sm:px-4 py-2 text-right">
               <div x-data="{ open: false }" class="flex flex-col items-end gap-1 justify-end">
                 <button @click="open = true" class="text-gray-700 text-sm hover:text-gray-900">View</button>
-                <a href="{{ route('purchases.edit', $p) }}" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a>
-                <form action="{{ route('purchases.destroy', $p) }}" method="POST" class="inline">
+                <a href="{{ route('purchases.edit.single', ['id' => $p->id]) }}" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a>
+                <form action="{{ route('purchases.destroy.single', ['id' => $p->id]) }}" method="POST" class="inline">
                   @csrf
                   @method('DELETE')
                   <button class="text-red-600 text-sm hover:text-red-800" onclick="return confirm('Delete this purchase?')">Delete</button>
@@ -49,8 +52,9 @@
                     </div>
                     <div class="space-y-2 text-sm text-gray-800">
                       <div class="flex justify-between"><span class="text-gray-500">Item</span><span class="font-medium">{{ $p->item_name }}</span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Cost</span><span class="font-medium">${{ number_format($p->cost_price,2) }}</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Unit cost</span><span class="font-medium">TZS {{ number_format($p->cost_price,2) }}</span></div>
                       <div class="flex justify-between"><span class="text-gray-500">Quantity</span><span class="font-medium">{{ $p->quantity }}</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-medium">TZS {{ number_format($p->cost_price * $p->quantity,2) }}</span></div>
                       <div class="flex justify-between"><span class="text-gray-500">Date</span><span class="font-medium">{{ $p->purchase_date->format('Y-m-d') }}</span></div>
                       <div>
                         <div class="text-gray-500">Description</div>

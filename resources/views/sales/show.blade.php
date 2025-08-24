@@ -12,7 +12,7 @@
       </div>
       <div>
         <div class="text-gray-500 text-sm">Selling Price</div>
-        <div class="font-medium text-gray-900">${{ number_format($sale->selling_price, 2) }}</div>
+        <div class="font-medium text-gray-900">TZS {{ number_format($sale->selling_price, 2) }}</div>
       </div>
       <div>
         <div class="text-gray-500 text-sm">Quantity Sold</div>
@@ -33,7 +33,7 @@
 
   <div class="mt-6 flex gap-3">
     <a href="{{ route('sales.index') }}" class="px-4 py-2 bg-gray-100 rounded">Back</a>
-    <a href="{{ route('sales.edit', $sale) }}" class="px-4 py-2 bg-indigo-600 text-white rounded">Edit</a>
+    <a href="{{ route('sales.edit.single', ['id' => $sale->id]) }}" class="px-4 py-2 bg-indigo-600 text-white rounded">Edit</a>
   </div>
 </div>
 @endsection

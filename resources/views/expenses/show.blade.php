@@ -10,7 +10,7 @@
     <div><span class="text-gray-600">Notes:</span> <span class="font-medium">{{ $expense->notes }}</span></div>
   </div>
   <div class="mt-3">
-    <a href="{{ route('expenses.edit', $expense) }}" class="px-3 py-2 bg-gray-100 rounded">Edit</a>
+    <a href="{{ route('expenses.edit.single', $expense) }}" class="px-3 py-2 bg-gray-100 rounded">Edit</a>
     <a href="{{ route('expenses.index') }}" class="px-3 py-2">Back</a>
   </div>
 </div>

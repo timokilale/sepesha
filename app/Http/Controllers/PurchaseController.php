@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Purchase;
+use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,44 +45,33 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'item_id' => 'nullable|exists:items,id',
-            'item_name' => 'required_without:item_id|string|max:255',
-            'cost_price' => 'nullable|numeric|min:0', // if carton_cost given, we'll derive unit cost
+            'item_id' => 'required|exists:items,id,deleted_at,NULL',
             'purchase_date' => 'required|date',
             'description' => 'nullable|string',
-            'quantity' => 'nullable|integer|min:1', // optional when using cartons
-            // packaging fields (optional)
-            'cartons' => 'nullable|integer|min:0',
-            'loose_units' => 'nullable|integer|min:0',
-            'units_per_carton' => 'nullable|integer|min:1',
-            'carton_cost' => 'nullable|numeric|min:0',
+            // carton-based required inputs
+            'cartons' => 'required|integer|min:1',
+            'units_per_carton' => 'required|integer|min:1',
+            'carton_cost' => 'required|numeric|min:0',
         ]);
 
         $validated['user_id'] = Auth::id();
 
-        // Compute quantity (total units) and unit cost if carton info provided
-        $cartons = (int) ($validated['cartons'] ?? 0);
-        $loose = (int) ($validated['loose_units'] ?? 0);
-        $unitsPerCarton = (int) ($validated['units_per_carton'] ?? 0);
-        $cartonCost = isset($validated['carton_cost']) ? (float) $validated['carton_cost'] : null;
+        // Ensure selected item belongs to this user and set display name
+        $item = Item::where('id', $validated['item_id'])->where('user_id', Auth::id())->first();
+        if (!$item) {
+            abort(422, 'Selected item is invalid.');
+        }
+        $validated['item_name'] = $item->name;
 
-        if ($unitsPerCarton > 0) {
-            $totalUnits = ($cartons * $unitsPerCarton) + $loose;
-            $validated['quantity'] = max(1, $totalUnits);
-            if ($cartonCost !== null) {
-                // Unit cost rounded up to the nearest whole (TZS has no cents)
-                $perUnit = (float) ceil($cartonCost / $unitsPerCarton);
-                $validated['cost_price'] = $perUnit;
-            }
-        }
+        // Compute quantity (total bottles) and unit cost per bottle from cartons
+        $cartons = (int) $validated['cartons'];
+        $unitsPerCarton = (int) $validated['units_per_carton'];
+        $cartonCost = (float) $validated['carton_cost'];
 
-        // Fallbacks if still missing
-        if (empty($validated['quantity'])) {
-            $validated['quantity'] = 1;
-        }
-        if (!isset($validated['cost_price'])) {
-            $validated['cost_price'] = 0;
-        }
+        $totalUnits = $cartons * $unitsPerCarton; // bottles
+        $validated['quantity'] = max(1, $totalUnits);
+        // Unit cost rounded up (TZS has no cents)
+        $validated['cost_price'] = (float) ceil($cartonCost / $unitsPerCarton);
 
         Purchase::create($validated);
 
@@ -92,28 +82,18 @@ class PurchaseController extends Controller
     /**
      * Display the specified purchase.
      */
-    public function show(Purchase $purchase)
+    public function show($id)
     {
-        // Ensure the purchase belongs to the authenticated user
-        if ($purchase->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $purchase->load('sales');
-        
+        $purchase = Auth::user()->purchases()->with('sales')->findOrFail($id);
         return view('purchases.show', compact('purchase'));
     }
 
     /**
      * Show the form for editing the specified purchase.
      */
-    public function edit(Purchase $purchase)
+    public function edit($id)
     {
-        // Ensure the purchase belongs to the authenticated user
-        if ($purchase->user_id !== Auth::id()) {
-            abort(403);
-        }
-
+        $purchase = Auth::user()->purchases()->findOrFail($id);
         $items = Auth::user()->items()->orderBy('name')->get();
         return view('purchases.edit', compact('purchase','items'));
     }
@@ -121,41 +101,32 @@ class PurchaseController extends Controller
     /**
      * Update the specified purchase in storage.
      */
-    public function update(Request $request, Purchase $purchase)
+    public function update(Request $request, $id)
     {
-        // Ensure the purchase belongs to the authenticated user
-        if ($purchase->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $purchase = Auth::user()->purchases()->findOrFail($id);
 
         $validated = $request->validate([
-            'item_id' => 'nullable|exists:items,id',
-            'item_name' => 'required_without:item_id|string|max:255',
-            'cost_price' => 'nullable|numeric|min:0',
+            'item_id' => 'required|exists:items,id,deleted_at,NULL',
             'purchase_date' => 'required|date',
             'description' => 'nullable|string',
-            'quantity' => 'nullable|integer|min:1',
-            'cartons' => 'nullable|integer|min:0',
-            'loose_units' => 'nullable|integer|min:0',
-            'units_per_carton' => 'nullable|integer|min:1',
-            'carton_cost' => 'nullable|numeric|min:0',
+            'cartons' => 'required|integer|min:1',
+            'units_per_carton' => 'required|integer|min:1',
+            'carton_cost' => 'required|numeric|min:0',
         ]);
 
-        // Recompute quantity and unit cost if carton info present
-        $cartons = (int) ($validated['cartons'] ?? $purchase->cartons ?? 0);
-        $loose = (int) ($validated['loose_units'] ?? $purchase->loose_units ?? 0);
-        $unitsPerCarton = (int) ($validated['units_per_carton'] ?? $purchase->units_per_carton ?? 0);
-        $cartonCost = array_key_exists('carton_cost', $validated) ? (float) $validated['carton_cost'] : ($purchase->carton_cost ?? null);
+        // Compute total bottles and per-bottle unit cost
+        $cartons = (int) $validated['cartons'];
+        $unitsPerCarton = (int) $validated['units_per_carton'];
+        $cartonCost = (float) $validated['carton_cost'];
+        $validated['quantity'] = $cartons * $unitsPerCarton;
+        $validated['cost_price'] = (float) ceil($cartonCost / $unitsPerCarton);
 
-        if ($unitsPerCarton > 0) {
-            $totalUnits = ($cartons * $unitsPerCarton) + $loose;
-            if ($totalUnits > 0) {
-                $validated['quantity'] = $totalUnits;
-            }
-            if ($cartonCost !== null) {
-                $validated['cost_price'] = (float) ceil($cartonCost / $unitsPerCarton);
-            }
+        // Ensure selected item belongs to this user and set display name
+        $item = Item::where('id', $validated['item_id'])->where('user_id', Auth::id())->first();
+        if (!$item) {
+            abort(422, 'Selected item is invalid.');
         }
+        $validated['item_name'] = $item->name;
 
         $purchase->update($validated);
 
@@ -166,13 +137,9 @@ class PurchaseController extends Controller
     /**
      * Remove the specified purchase from storage.
      */
-    public function destroy(Purchase $purchase)
+    public function destroy($id)
     {
-        // Ensure the purchase belongs to the authenticated user
-        if ($purchase->user_id !== Auth::id()) {
-            abort(403);
-        }
-
+        $purchase = Auth::user()->purchases()->findOrFail($id);
         $purchase->delete();
 
         return redirect()->route('purchases.index')

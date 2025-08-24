@@ -26,14 +26,14 @@
               <div class="font-medium">{{ $s->purchase->item_name }}</div>
               <div class="text-sm text-gray-500 sm:hidden">Qty: {{ $s->quantity_sold }} • {{ $s->sale_date->format('M d, Y') }}</div>
             </td>
-            <td class="px-2 sm:px-4 py-2 font-medium">${{ number_format($s->selling_price,2) }}</td>
+            <td class="px-2 sm:px-4 py-2 font-medium">TZS {{ number_format($s->selling_price,2) }}</td>
             <td class="px-2 sm:px-4 py-2 hidden sm:table-cell">{{ $s->quantity_sold }}</td>
             <td class="px-2 sm:px-4 py-2 hidden md:table-cell">{{ $s->sale_date->format('Y-m-d') }}</td>
             <td class="px-2 sm:px-4 py-2 text-right">
               <div x-data="{ open: false }" class="flex flex-col items-end gap-1 justify-end">
                 <button @click="open = true" class="text-gray-700 text-sm hover:text-gray-900">View</button>
-                <a href="{{ route('sales.edit', $s) }}" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a>
-                <form action="{{ route('sales.destroy', $s) }}" method="POST" class="inline">
+                <a href="{{ route('sales.edit.single', ['id' => $s->id]) }}" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a>
+                <form action="{{ route('sales.destroy.single', ['id' => $s->id]) }}" method="POST" class="inline">
                   @csrf
                   @method('DELETE')
                   <button class="text-red-600 text-sm hover:text-red-800" onclick="return confirm('Delete this sale?')">Delete</button>
@@ -49,7 +49,7 @@
                     </div>
                     <div class="space-y-2 text-sm text-gray-800">
                       <div class="flex justify-between"><span class="text-gray-500">Item</span><span class="font-medium">{{ $s->purchase->item_name }}</span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Selling Price</span><span class="font-medium">${{ number_format($s->selling_price,2) }}</span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Selling Price</span><span class="font-medium">TZS {{ number_format($s->selling_price,2) }}</span></div>
                       <div class="flex justify-between"><span class="text-gray-500">Quantity Sold</span><span class="font-medium">{{ $s->quantity_sold }}</span></div>
                       <div class="flex justify-between"><span class="text-gray-500">Date</span><span class="font-medium">{{ $s->sale_date->format('Y-m-d') }}</span></div>
                       <div>
