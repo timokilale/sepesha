@@ -38,14 +38,15 @@ class ChartController extends Controller
         foreach ($period as $month) {
             $labels[] = $month->format('M Y');
 
-            // Purchases: unit cost × quantity for the month
-            $monthlyPurchases = (float) $user->purchases()
+            // Purchases: use total_cost accessor (handles beverages and meat) — GLOBAL, not user-scoped
+            $monthlyPurchases = (float) \App\Models\Purchase::query()
                 ->whereYear('purchase_date', $month->year)
                 ->whereMonth('purchase_date', $month->month)
-                ->get(['cost_price','quantity'])
-                ->sum(function ($p) { return (float) $p->cost_price * (int) $p->quantity; });
+                ->get()
+                ->sum(function ($p) { return (float) $p->total_cost; });
 
-            $monthlySales = (float) $user->sales()
+            // Sales: selling_price × quantity_sold — GLOBAL
+            $monthlySales = (float) \App\Models\Sale::query()
                 ->whereYear('sale_date', $month->year)
                 ->whereMonth('sale_date', $month->month)
                 ->get(['selling_price', 'quantity_sold'])
@@ -53,8 +54,8 @@ class ChartController extends Controller
                     return (float) $sale->selling_price * (int) $sale->quantity_sold;
                 });
 
-            // Expenses: sum of expense amounts for the month
-            $monthlyExpenses = (float) $user->expenses()
+            // Expenses: sum of amounts — GLOBAL
+            $monthlyExpenses = (float) \App\Models\Expense::query()
                 ->whereYear('expense_date', $month->year)
                 ->whereMonth('expense_date', $month->month)
                 ->sum('amount');
