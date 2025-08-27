@@ -7,6 +7,44 @@
     <a href="{{ route('sales.create') }}" class="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-center">Add Sale</a>
   </div>
 
+  <!-- Filters -->
+  <div x-data="{ open: {{ request('start_date') || request('end_date') || request('sort') ? 'true' : 'false' }} }" class="mb-3">
+    <button type="button" @click="open = !open" class="inline-flex items-center gap-2 px-3 py-1.5 border rounded bg-white hover:bg-gray-50 text-sm">
+      Filters
+      <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
+      <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 9.06l-3.71 3.71a.75.75 0 11-1.06-1.06l4.24-4.24a.75.75 0 011.06 0l4.24 4.24c.29.29.3.77.02 1.08z" clip-rule="evenodd"/></svg>
+      @if(request('start_date') || request('end_date') || request('sort'))
+        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded bg-green-50 text-green-700 text-xs">Active</span>
+      @endif
+    </button>
+    <div x-show="open" x-collapse class="mt-2">
+      <form method="GET" action="{{ route('sales.index') }}" class="bg-white rounded border p-3">
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-gray-600 mb-1">Start date</label>
+            <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full border rounded px-2 py-1" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-gray-600 mb-1">End date</label>
+            <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full border rounded px-2 py-1" />
+          </div>
+          <div>
+            <label class="block text-xs text-gray-600 mb-1">Sort</label>
+            <select name="sort" class="w-full border rounded px-2 py-1">
+              <option value="" @selected(!request('sort'))>Latest</option>
+              <option value="name_asc" @selected(request('sort')==='name_asc')>Name A–Z</option>
+              <option value="name_desc" @selected(request('sort')==='name_desc')>Name Z–A</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-2 flex gap-2">
+          <button class="px-3 py-1.5 bg-green-600 text-white rounded">Apply</button>
+          <a href="{{ route('sales.index') }}" class="px-3 py-1.5 bg-gray-100 rounded">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="bg-white rounded border overflow-hidden">
     <div class="overflow-x-auto">
       <table class="data-table min-w-full divide-y divide-gray-200">
@@ -25,7 +63,6 @@
           <tr>
             <td class="px-2 sm:px-4 py-2 text-gray-800">
               <div class="font-medium">{{ $s->purchase->item_name }}</div>
-              <div class="text-sm text-gray-500 sm:hidden">Qty: {{ $s->display_quantity }} {{ $s->display_unit }} • TZS {{ number_format($s->display_price,2) }} • {{ $s->sale_date->format('M d, Y') }}</div>
             </td>
             <td class="px-2 sm:px-4 py-2 font-medium hidden sm:table-cell">TZS {{ number_format($s->display_price,2) }}</td>
             <td class="px-2 sm:px-4 py-2 hidden sm:table-cell">{{ $s->display_quantity }} {{ $s->display_unit }}</td>
@@ -34,7 +71,7 @@
             <td class="px-2 sm:px-4 py-2 text-right">
               <div x-data="{ open: false }" class="flex flex-col items-end gap-1 justify-end">
                 <button @click="open = true" class="text-gray-700 text-sm hover:text-gray-900">View</button>
-                <a href="{{ route('sales.edit.single', ['id' => $s->id]) }}" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a>
+                {{-- <a href="{{ route('sales.edit.single', ['id' => $s->id]) }}" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a> --}}
                 <form action="{{ route('sales.destroy.single', ['id' => $s->id]) }}" method="POST" class="inline">
                   @csrf
                   @method('DELETE')

@@ -20,12 +20,33 @@ class PurchaseController extends Controller
     /**
      * Display a listing of the purchases.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $purchases = Purchase::with('sales')
-            ->orderBy('purchase_date', 'desc')
-            ->paginate(10);
-            
+        $query = Purchase::query()->with('sales');
+
+        // Date range filter
+        $start = $request->query('start_date');
+        $end = $request->query('end_date');
+        if ($start && $end) {
+            $query->whereBetween('purchase_date', [$start, $end]);
+        } elseif ($start) {
+            $query->whereDate('purchase_date', '>=', $start);
+        } elseif ($end) {
+            $query->whereDate('purchase_date', '<=', $end);
+        }
+
+        // Sorting
+        $sort = $request->query('sort');
+        if ($sort === 'name_asc') {
+            $query->orderBy('item_name', 'asc');
+        } elseif ($sort === 'name_desc') {
+            $query->orderBy('item_name', 'desc');
+        } else {
+            $query->orderBy('purchase_date', 'desc');
+        }
+
+        $purchases = $query->paginate(10)->appends($request->query());
+        
         return view('purchases.index', compact('purchases'));
     }
 

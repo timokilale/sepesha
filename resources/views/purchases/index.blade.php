@@ -7,6 +7,44 @@
     <a href="{{ route('purchases.create') }}" class="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-center">Add Purchase</a>
   </div>
 
+  <!-- Filters -->
+  <div x-data="{ open: {{ request('start_date') || request('end_date') || request('sort') ? 'true' : 'false' }} }" class="mb-3">
+    <button type="button" @click="open = !open" class="inline-flex items-center gap-2 px-3 py-1.5 border rounded bg-white hover:bg-gray-50 text-sm">
+      Filters
+      <svg x-show="!open" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
+      <svg x-show="open" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 9.06l-3.71 3.71a.75.75 0 11-1.06-1.06l4.24-4.24a.75.75 0 011.06 0l4.24 4.24c.29.29.3.77.02 1.08z" clip-rule="evenodd"/></svg>
+      @if(request('start_date') || request('end_date') || request('sort'))
+        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 text-xs">Active</span>
+      @endif
+    </button>
+    <div x-show="open" x-transition class="mt-2">
+      <form method="GET" action="{{ route('purchases.index') }}" class="bg-white rounded border p-3">
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-gray-600 mb-1">Start date</label>
+            <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full border rounded px-2 py-1" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs text-gray-600 mb-1">End date</label>
+            <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full border rounded px-2 py-1" />
+          </div>
+          <div>
+            <label class="block text-xs text-gray-600 mb-1">Sort</label>
+            <select name="sort" class="w-full border rounded px-2 py-1">
+              <option value="" @selected(!request('sort'))>Latest</option>
+              <option value="name_asc" @selected(request('sort')==='name_asc')>Name A–Z</option>
+              <option value="name_desc" @selected(request('sort')==='name_desc')>Name Z–A</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-2 flex gap-2">
+          <button class="px-3 py-1.5 bg-indigo-600 text-white rounded">Apply</button>
+          <a href="{{ route('purchases.index') }}" class="px-3 py-1.5 bg-gray-100 rounded">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="bg-white rounded border overflow-hidden">
     <div class="overflow-x-auto">
       <table class="data-table min-w-full divide-y divide-gray-200">
@@ -24,13 +62,10 @@
           <tr>
             <td class="px-2 sm:px-4 py-2 text-gray-800">
               <div class="font-medium">{{ $p->item_name }}</div>
-              <div class="text-sm text-gray-500 sm:hidden">
-                Qty: @if($p->item && $p->item->uom_type === 'weight'){{ $p->item->formatBaseQuantity($p->quantity) }}@else{{ $p->quantity }}@endif • {{ $p->purchase_date->format('M d, Y') }}
-              </div>
             </td>
             <td class="px-2 sm:px-4 py-2">
               <div class="font-semibold">TZS {{ number_format($p->total_cost, 2) }}</div>
-              <div class="text-xs text-gray-500">
+              <div class="hidden sm:block text-xs text-gray-500">
                 @if($p->item && $p->item->uom_type === 'weight')
                   Per kg: TZS {{ number_format($p->cost_price * 1000, 1) }}
                 @else
@@ -49,7 +84,7 @@
             <td class="px-2 sm:px-4 py-2 text-right">
               <div x-data="{ open: false }" class="flex flex-col items-end gap-1 justify-end">
                 <button @click="open = true" class="text-gray-700 text-sm hover:text-gray-900">View</button>
-                <a href="{{ route('purchases.edit.single', ['id' => $p->id]) }}" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a>
+                {{-- <a href="{{ route('purchases.edit.single', ['id' => $p->id]) }}" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a> --}}
                 <form action="{{ route('purchases.destroy.single', ['id' => $p->id]) }}" method="POST" class="inline">
                   @csrf
                   @method('DELETE')

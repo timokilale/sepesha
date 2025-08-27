@@ -7,6 +7,32 @@
     <a href="<?php echo e(route('sales.create')); ?>" class="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-center">Add Sale</a>
   </div>
 
+  <!-- Filters -->
+  <form method="GET" action="<?php echo e(route('sales.index')); ?>" class="bg-white rounded border p-3 mb-3">
+    <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+      <div class="sm:col-span-2">
+        <label class="block text-xs text-gray-600 mb-1">Start date</label>
+        <input type="date" name="start_date" value="<?php echo e(request('start_date')); ?>" class="w-full border rounded px-2 py-1" />
+      </div>
+      <div class="sm:col-span-2">
+        <label class="block text-xs text-gray-600 mb-1">End date</label>
+        <input type="date" name="end_date" value="<?php echo e(request('end_date')); ?>" class="w-full border rounded px-2 py-1" />
+      </div>
+      <div>
+        <label class="block text-xs text-gray-600 mb-1">Sort</label>
+        <select name="sort" class="w-full border rounded px-2 py-1">
+          <option value="" <?php if(!request('sort')): echo 'selected'; endif; ?>>Latest</option>
+          <option value="name_asc" <?php if(request('sort')==='name_asc'): echo 'selected'; endif; ?>>Name A–Z</option>
+          <option value="name_desc" <?php if(request('sort')==='name_desc'): echo 'selected'; endif; ?>>Name Z–A</option>
+        </select>
+      </div>
+    </div>
+    <div class="mt-2 flex gap-2">
+      <button class="px-3 py-1.5 bg-green-600 text-white rounded">Apply</button>
+      <a href="<?php echo e(route('sales.index')); ?>" class="px-3 py-1.5 bg-gray-100 rounded">Reset</a>
+    </div>
+  </form>
+
   <div class="bg-white rounded border overflow-hidden">
     <div class="overflow-x-auto">
       <table class="data-table min-w-full divide-y divide-gray-200">
@@ -25,7 +51,6 @@
           <tr>
             <td class="px-2 sm:px-4 py-2 text-gray-800">
               <div class="font-medium"><?php echo e($s->purchase->item_name); ?></div>
-              <div class="text-sm text-gray-500 sm:hidden">Qty: <?php echo e($s->display_quantity); ?> <?php echo e($s->display_unit); ?> • TZS <?php echo e(number_format($s->display_price,2)); ?> • <?php echo e($s->sale_date->format('M d, Y')); ?></div>
             </td>
             <td class="px-2 sm:px-4 py-2 font-medium hidden sm:table-cell">TZS <?php echo e(number_format($s->display_price,2)); ?></td>
             <td class="px-2 sm:px-4 py-2 hidden sm:table-cell"><?php echo e($s->display_quantity); ?> <?php echo e($s->display_unit); ?></td>
@@ -34,7 +59,7 @@
             <td class="px-2 sm:px-4 py-2 text-right">
               <div x-data="{ open: false }" class="flex flex-col items-end gap-1 justify-end">
                 <button @click="open = true" class="text-gray-700 text-sm hover:text-gray-900">View</button>
-                <a href="<?php echo e(route('sales.edit.single', ['id' => $s->id])); ?>" class="text-indigo-600 text-sm hover:text-indigo-800">Edit</a>
+                
                 <form action="<?php echo e(route('sales.destroy.single', ['id' => $s->id])); ?>" method="POST" class="inline">
                   <?php echo csrf_field(); ?>
                   <?php echo method_field('DELETE'); ?>

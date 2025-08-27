@@ -227,10 +227,14 @@ class Item extends Model
                 }
                 return $baseQty . ' ml';
             case 'weight':
-                if ($baseQty % 1000 === 0) {
-                    return ($baseQty / 1000) . ' kg';
+                // Always show weight in kg with decimals (no grams)
+                $kg = $baseQty / 1000;
+                // Trim trailing zeros and dot for clean display (e.g., 1.500 -> 1.5, 2.000 -> 2)
+                $formatted = rtrim(rtrim(number_format($kg, 3, '.', ''), '0'), '.');
+                if ($formatted === '') {
+                    $formatted = '0';
                 }
-                return $baseQty . ' g';
+                return $formatted . ' kg';
             default:
                 return $baseQty . ' pcs';
         }

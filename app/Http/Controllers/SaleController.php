@@ -20,12 +20,35 @@ class SaleController extends Controller
     /**
      * Display a listing of the sales.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $sales = Sale::with('purchase')
-            ->orderBy('sale_date', 'desc')
-            ->paginate(10);
-            
+        $query = Sale::query()->with('purchase');
+
+        // Date range filter
+        $start = $request->query('start_date');
+        $end = $request->query('end_date');
+        if ($start && $end) {
+            $query->whereBetween('sale_date', [$start, $end]);
+        } elseif ($start) {
+            $query->whereDate('sale_date', '>=', $start);
+        } elseif ($end) {
+            $query->whereDate('sale_date', '<=', $end);
+        }
+
+        // Sorting
+        $sort = $request->query('sort');
+        if ($sort === 'name_asc' || $sort === 'name_desc') {
+            $dir = $sort === 'name_asc' ? 'asc' : 'desc';
+            // Join purchases to sort by item_name
+            $query->leftJoin('purchases', 'sales.purchase_id', '=', 'purchases.id')
+                  ->orderBy('purchases.item_name', $dir)
+                  ->select('sales.*');
+        } else {
+            $query->orderBy('sale_date', 'desc');
+        }
+
+        $sales = $query->paginate(10)->appends($request->query());
+        
         return view('sales.index', compact('sales'));
     }
 
