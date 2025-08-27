@@ -24,13 +24,27 @@
           <tr>
             <td class="px-2 sm:px-4 py-2 text-gray-800">
               <div class="font-medium">{{ $p->item_name }}</div>
-              <div class="text-sm text-gray-500 sm:hidden">Qty: {{ $p->quantity }} • {{ $p->purchase_date->format('M d, Y') }}</div>
+              <div class="text-sm text-gray-500 sm:hidden">
+                Qty: @if($p->item && $p->item->uom_type === 'weight'){{ $p->item->formatBaseQuantity($p->quantity) }}@else{{ $p->quantity }}@endif • {{ $p->purchase_date->format('M d, Y') }}
+              </div>
             </td>
             <td class="px-2 sm:px-4 py-2">
-              <div class="font-semibold">TZS {{ number_format($p->cost_price * $p->quantity, 2) }}</div>
-              <div class="text-xs text-gray-500">Unit: TZS {{ number_format($p->cost_price, 2) }}</div>
+              <div class="font-semibold">TZS {{ number_format($p->total_cost, 2) }}</div>
+              <div class="text-xs text-gray-500">
+                @if($p->item && $p->item->uom_type === 'weight')
+                  Per kg: TZS {{ number_format($p->cost_price * 1000, 1) }}
+                @else
+                  Chupa (derived): TZS {{ number_format($p->cost_price, 1) }}
+                @endif
+              </div>
             </td>
-            <td class="px-2 sm:px-4 py-2 hidden sm:table-cell">{{ $p->quantity }}</td>
+            <td class="px-2 sm:px-4 py-2 hidden sm:table-cell">
+              @if($p->item && $p->item->uom_type === 'weight')
+                {{ $p->item->formatBaseQuantity($p->quantity) }}
+              @else
+                {{ $p->quantity }}
+              @endif
+            </td>
             <td class="px-2 sm:px-4 py-2 hidden md:table-cell">{{ $p->purchase_date->format('Y-m-d') }}</td>
             <td class="px-2 sm:px-4 py-2 text-right">
               <div x-data="{ open: false }" class="flex flex-col items-end gap-1 justify-end">
@@ -52,9 +66,33 @@
                     </div>
                     <div class="space-y-2 text-sm text-gray-800">
                       <div class="flex justify-between"><span class="text-gray-500">Item</span><span class="font-medium">{{ $p->item_name }}</span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Unit cost</span><span class="font-medium">TZS {{ number_format($p->cost_price,2) }}</span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Quantity</span><span class="font-medium">{{ $p->quantity }}</span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-medium">TZS {{ number_format($p->cost_price * $p->quantity,2) }}</span></div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">
+                          @if($p->item && $p->item->uom_type === 'weight')
+                            Per kg cost
+                          @else
+                            Unit cost (derived)
+                          @endif
+                        </span>
+                        <span class="font-medium">
+                          @if($p->item && $p->item->uom_type === 'weight')
+                            TZS {{ number_format($p->cost_price * 1000, 1) }}
+                          @else
+                            TZS {{ number_format($p->cost_price, 1) }}
+                          @endif
+                        </span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Quantity</span>
+                        <span class="font-medium">
+                          @if($p->item && $p->item->uom_type === 'weight')
+                            {{ $p->item->formatBaseQuantity($p->quantity) }}
+                          @else
+                            {{ $p->quantity }}
+                          @endif
+                        </span>
+                      </div>
+                      <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-medium">TZS {{ number_format($p->total_cost,2) }}</span></div>
                       <div class="flex justify-between"><span class="text-gray-500">Date</span><span class="font-medium">{{ $p->purchase_date->format('Y-m-d') }}</span></div>
                       <div>
                         <div class="text-gray-500">Description</div>

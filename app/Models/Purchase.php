@@ -36,7 +36,7 @@ class Purchase extends Model
      */
     protected $casts = [
         'purchase_date' => 'date',
-        'cost_price' => 'decimal:2',
+        'cost_price' => 'decimal:1',
     ];
 
     /**
@@ -64,6 +64,14 @@ class Purchase extends Model
     }
 
     /**
+     * Loss entries associated with this purchase.
+     */
+    public function losses()
+    {
+        return $this->hasMany(Loss::class);
+    }
+
+    /**
      * Get the total quantity sold for this purchase.
      */
     public function getTotalQuantitySoldAttribute()
@@ -72,11 +80,19 @@ class Purchase extends Model
     }
 
     /**
+     * Total quantity recorded as loss for this purchase (in base units of the item).
+     */
+    public function getTotalQuantityLostAttribute()
+    {
+        return $this->losses->sum('quantity');
+    }
+
+    /**
      * Get the remaining quantity for this purchase.
      */
     public function getRemainingQuantityAttribute()
     {
-        return $this->quantity - $this->total_quantity_sold;
+        return $this->quantity - $this->total_quantity_sold - $this->total_quantity_lost;
     }
 
     /**
@@ -96,6 +112,37 @@ class Purchase extends Model
     }
 
     /**
+     * Computed: exact unit cost derived from carton (higher precision for internal math).
+     * Falls back to stored cost_price when packaging fields are missing.
+     */
+    public function getExactUnitCostAttribute()
+    {
+        if (!empty($this->units_per_carton) && !empty($this->carton_cost)) {
+            // Use higher precision for internal computations
+            return round(((float) $this->carton_cost) / (int) $this->units_per_carton, 4);
+        }
+        return (float) $this->cost_price;
+    }
+
+    /**
+     * Computed: total purchase cost, driven by carton cost (authoritative).
+     * Includes loose units valued at the exact unit cost.
+     */
+    public function getTotalCostAttribute()
+    {
+        if (!empty($this->cartons) && !empty($this->carton_cost)) {
+            $cartonTotal = (int) $this->cartons * (float) $this->carton_cost;
+            $loose = (int) ($this->loose_units ?? 0);
+            if ($loose > 0) {
+                return $cartonTotal + ($loose * $this->exact_unit_cost);
+            }
+            return $cartonTotal;
+        }
+        // Fallback to legacy behavior when packaging fields are not present
+        return (float) $this->cost_price * (int) $this->quantity;
+    }
+
+    /**
      * Get the total revenue from sales of this purchase.
      */
     public function getTotalRevenueAttribute()
@@ -110,7 +157,9 @@ class Purchase extends Model
      */
     public function getProfitLossAttribute()
     {
-        $totalCost = $this->unit_cost * $this->total_quantity_sold;
-        return $this->total_revenue - $totalCost;
+        // Use exact unit cost derived from carton for COGS to avoid rounding drift
+        $totalCostSold = $this->exact_unit_cost * $this->total_quantity_sold;
+        $lossCost = $this->exact_unit_cost * $this->total_quantity_lost;
+        return $this->total_revenue - $totalCostSold - $lossCost;
     }
 }

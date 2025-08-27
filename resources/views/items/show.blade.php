@@ -14,11 +14,16 @@
       </div>
     </div>
     <div class="md:col-span-2 space-y-2">
-      <div><span class="text-gray-600">Name:</span> <span class="font-medium">{{ $item->name }}</span></div>
-      <div><span class="text-gray-600">Category:</span> <span class="font-medium">{{ $item->category ?? '—' }}</span></div>
+      <div class="flex items-center gap-2">
+        <div><span class="text-gray-600">Name:</span> <span class="font-medium">{{ $item->name }}</span></div>
+        <span class="text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">{{ ucfirst($item->uom_type ?? 'unit') }}</span>
+      </div>
+      <!--<div><span class="text-gray-600">Category:</span> <span class="font-medium">{{ $item->category ?? '—' }}</span></div>-->
       <div><span class="text-gray-600">SKU:</span> <span class="font-medium">{{ $item->sku ?? '—' }}</span></div>
-      <div><span class="text-gray-600">Unit:</span> <span class="font-medium">{{ $item->unit_name ?? '—' }}</span></div>
-      <div><span class="text-gray-600">Carton size:</span> <span class="font-medium">{{ $item->carton_size ?? '—' }}</span></div>
+      @if(($item->uom_type ?? 'unit') !== 'weight')
+        <div><span class="text-gray-600">Unit:</span> <span class="font-medium">{{ $item->unit_name ?? '—' }}</span></div>
+        <div><span class="text-gray-600">Carton size:</span> <span class="font-medium">{{ $item->carton_size ?? '—' }}</span></div>
+      @endif
       <div>
         <span class="text-gray-600">Profit/Loss:</span>
         @php($pl = $item->profit_loss ?? 0)
@@ -26,11 +31,14 @@
       </div>
       <div><span class="text-gray-600">Notes:</span> <span class="font-medium">{{ $item->notes ?? '—' }}</span></div>
 
-      <p class="text-xs text-gray-500 pt-1">Unit is the smallest piece you sell (e.g., bottle). Carton size is how many units are in one carton (e.g., 25 bottles in a carton). You can buy by cartons or by units.</p>
+      @if(($item->uom_type ?? 'unit') !== 'weight')
+        <p class="text-xs text-gray-500 pt-1">Unit is the smallest piece you sell (e.g., bottle). Carton size is how many units are in one carton (e.g., 25 bottles in a carton). You can buy by cartons or by units.</p>
+      @endif
 
       <div class="pt-2 flex flex-wrap gap-2">
         <a href="{{ route('purchases.create', ['item_id' => $item->id]) }}" class="px-3 py-2 bg-indigo-600 text-white rounded">Add Purchase</a>
         <a href="{{ route('sales.create', ['item_id' => $item->id]) }}" class="px-3 py-2 bg-green-600 text-white rounded">Add Sale</a>
+        <a href="{{ route('losses.create', ['item_id' => $item->id]) }}" class="px-3 py-2 bg-red-600 text-white rounded">Record Loss</a>
         <a href="{{ route('items.edit.single', ['id' => $item->id]) }}" class="px-3 py-2 bg-gray-100 rounded">Edit</a>
         <a href="{{ route('items.index') }}" class="px-3 py-2">Back</a>
       </div>

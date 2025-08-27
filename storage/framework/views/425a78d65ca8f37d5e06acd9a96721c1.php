@@ -55,6 +55,7 @@
                                class="inline-flex items-center px-1 pt-1 border-b-2 <?php echo e((request()->routeIs('items.*') || request()->routeIs('item')) ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'); ?> text-sm font-medium">
                                 Products
                             </a>
+                            <?php if(auth()->user()->isAdmin()): ?>
                             <a href="<?php echo e(route('charts.index')); ?>" 
                                class="inline-flex items-center px-1 pt-1 border-b-2 <?php echo e(request()->routeIs('charts.index') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'); ?> text-sm font-medium">
                                 Insights
@@ -63,6 +64,11 @@
                                class="inline-flex items-center px-1 pt-1 border-b-2 <?php echo e(request()->routeIs('expenses.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'); ?> text-sm font-medium">
                                 Expenses
                             </a>
+                            <a href="<?php echo e(route('users.index')); ?>" 
+                               class="inline-flex items-center px-1 pt-1 border-b-2 <?php echo e(request()->routeIs('users.*') ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'); ?> text-sm font-medium">
+                                Users
+                            </a>
+                            <?php endif; ?>
                             <button id="install-app-desktop" type="button" class="inline-flex items-center px-2 py-1.5 ml-4 border rounded text-sm text-gray-700 hover:bg-gray-100 hidden">Install Olomitu</button>
                         </div>
                     </div>
@@ -86,6 +92,14 @@
                             <div x-show="open" @click.away="open = false" 
                                  class="origin-top-right absolute right-0 mt-2 w-48 rounded-md bg-white border z-50">
                                 <div class="py-1">
+                                    <div class="px-4 py-2 text-xs text-gray-500 border-b">
+                                        <?php echo e(Auth::user()->name); ?>
+
+                                        <span class="inline-block px-2 py-0.5 text-xs rounded <?php echo e(Auth::user()->isAdmin() ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'); ?>">
+                                            <?php echo e(ucfirst(Auth::user()->role)); ?>
+
+                                        </span>
+                                    </div>
                                     <a href="<?php echo e(route('profile.edit')); ?>" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         Profile
                                     </a>
@@ -127,6 +141,7 @@
                                    class="block px-4 py-2 text-sm <?php echo e((request()->routeIs('items.*') || request()->routeIs('item')) ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100'); ?>">
                                     Products
                                 </a>
+                                <?php if(auth()->user()->isAdmin()): ?>
                                 <a href="<?php echo e(route('charts.index')); ?>" 
                                    class="block px-4 py-2 text-sm <?php echo e(request()->routeIs('charts.index') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100'); ?>">
                                     Insights
@@ -135,6 +150,11 @@
                                    class="block px-4 py-2 text-sm <?php echo e(request()->routeIs('expenses.*') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100'); ?>">
                                     Expenses
                                 </a>
+                                <a href="<?php echo e(route('users.index')); ?>" 
+                                   class="block px-4 py-2 text-sm <?php echo e(request()->routeIs('users.*') ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:bg-gray-100'); ?>">
+                                    Users
+                                </a>
+                                <?php endif; ?>
                                 <button id="install-app-mobile" type="button" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hidden">Install Olomitu</button>
                                 <div class="border-t border-gray-200 my-1"></div>
                                 <!-- Profile / auth -->
@@ -165,15 +185,32 @@
               table.data-table tbody tr:hover { background-color: #f9fafb; } /* gray-50 */
             </style>
             <?php if(session('success')): ?>
-                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-                    <div class="flex items-center gap-2 border-l-4 border-green-500 bg-green-50 text-green-700 px-3 py-2" role="alert">
-                        <span class="text-sm"><?php echo e(session('success')); ?></span>
+                <div x-data="{ show: true, pwd: null }" x-init="
+                        // auto-hide after 15s
+                        setTimeout(() => show = false, 15000);
+                        // extract password from message text
+                        (() => { const t = $refs.msg?.innerText || ''; const m = t.match(/Password:\s*([A-Za-z0-9]+)/); pwd = m ? m[1] : null; })();
+                    " x-show="show" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                    <div class="flex items-center gap-3 border-l-4 border-green-500 bg-green-50 text-green-700 px-3 py-2" role="alert">
+                        <span x-ref="msg" class="text-sm"><?php echo e(session('success')); ?></span>
+                        <div class="ml-auto flex items-center gap-2" x-show="pwd">
+                            <button @click="navigator.clipboard.writeText(pwd); $refs.copied?.classList.remove('hidden'); setTimeout(() => $refs.copied?.classList.add('hidden'), 1500);"
+                                    type="button"
+                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-700 bg-white/70 hover:bg-white border border-green-200 rounded">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                                    <path d="M6 2a2 2 0 00-2 2v8a2 2 0 002 2h5a2 2 0 002-2V7.414A2 2 0 0012.414 6L9.586 3.172A2 2 0 008.172 2H6z" />
+                                    <path d="M8 3h.172A2 2 0 019.586 3.586L12.414 6.414A2 2 0 0113 7.828V8a2 2 0 012 2v4a2 2 0 01-2 2H8a1 1 0 110-2h5a1 1 0 001-1v-4a1 1 0 00-1-1h-1a2 2 0 01-2-2V3a1 1 0 10-2 0z" />
+                                </svg>
+                                Copy password
+                            </button>
+                            <span x-ref="copied" class="text-xs text-green-700 hidden">Copied</span>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>
 
             <?php if(session('error')): ?>
-                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 15000)" x-show="show" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
                     <div class="flex items-center gap-2 border-l-4 border-red-500 bg-red-50 text-red-700 px-3 py-2" role="alert">
                         <span class="text-sm"><?php echo e(session('error')); ?></span>
                     </div>

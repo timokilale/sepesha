@@ -24,13 +24,32 @@
           <tr>
             <td class="px-2 sm:px-4 py-2 text-gray-800">
               <div class="font-medium"><?php echo e($p->item_name); ?></div>
-              <div class="text-sm text-gray-500 sm:hidden">Qty: <?php echo e($p->quantity); ?> • <?php echo e($p->purchase_date->format('M d, Y')); ?></div>
+              <div class="text-sm text-gray-500 sm:hidden">
+                Qty: <?php if($p->item && $p->item->uom_type === 'weight'): ?><?php echo e($p->item->formatBaseQuantity($p->quantity)); ?><?php else: ?><?php echo e($p->quantity); ?><?php endif; ?> • <?php echo e($p->purchase_date->format('M d, Y')); ?>
+
+              </div>
             </td>
             <td class="px-2 sm:px-4 py-2">
-              <div class="font-semibold">TZS <?php echo e(number_format($p->cost_price * $p->quantity, 2)); ?></div>
-              <div class="text-xs text-gray-500">Unit: TZS <?php echo e(number_format($p->cost_price, 2)); ?></div>
+              <div class="font-semibold">TZS <?php echo e(number_format($p->total_cost, 2)); ?></div>
+              <div class="text-xs text-gray-500">
+                <?php if($p->item && $p->item->uom_type === 'weight'): ?>
+                  Per kg: TZS <?php echo e(number_format($p->cost_price * 1000, 1)); ?>
+
+                <?php else: ?>
+                  Chupa (derived): TZS <?php echo e(number_format($p->cost_price, 1)); ?>
+
+                <?php endif; ?>
+              </div>
             </td>
-            <td class="px-2 sm:px-4 py-2 hidden sm:table-cell"><?php echo e($p->quantity); ?></td>
+            <td class="px-2 sm:px-4 py-2 hidden sm:table-cell">
+              <?php if($p->item && $p->item->uom_type === 'weight'): ?>
+                <?php echo e($p->item->formatBaseQuantity($p->quantity)); ?>
+
+              <?php else: ?>
+                <?php echo e($p->quantity); ?>
+
+              <?php endif; ?>
+            </td>
             <td class="px-2 sm:px-4 py-2 hidden md:table-cell"><?php echo e($p->purchase_date->format('Y-m-d')); ?></td>
             <td class="px-2 sm:px-4 py-2 text-right">
               <div x-data="{ open: false }" class="flex flex-col items-end gap-1 justify-end">
@@ -52,9 +71,37 @@
                     </div>
                     <div class="space-y-2 text-sm text-gray-800">
                       <div class="flex justify-between"><span class="text-gray-500">Item</span><span class="font-medium"><?php echo e($p->item_name); ?></span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Unit cost</span><span class="font-medium">TZS <?php echo e(number_format($p->cost_price,2)); ?></span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Quantity</span><span class="font-medium"><?php echo e($p->quantity); ?></span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-medium">TZS <?php echo e(number_format($p->cost_price * $p->quantity,2)); ?></span></div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">
+                          <?php if($p->item && $p->item->uom_type === 'weight'): ?>
+                            Per kg cost
+                          <?php else: ?>
+                            Unit cost (derived)
+                          <?php endif; ?>
+                        </span>
+                        <span class="font-medium">
+                          <?php if($p->item && $p->item->uom_type === 'weight'): ?>
+                            TZS <?php echo e(number_format($p->cost_price * 1000, 1)); ?>
+
+                          <?php else: ?>
+                            TZS <?php echo e(number_format($p->cost_price, 1)); ?>
+
+                          <?php endif; ?>
+                        </span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-500">Quantity</span>
+                        <span class="font-medium">
+                          <?php if($p->item && $p->item->uom_type === 'weight'): ?>
+                            <?php echo e($p->item->formatBaseQuantity($p->quantity)); ?>
+
+                          <?php else: ?>
+                            <?php echo e($p->quantity); ?>
+
+                          <?php endif; ?>
+                        </span>
+                      </div>
+                      <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-medium">TZS <?php echo e(number_format($p->total_cost,2)); ?></span></div>
                       <div class="flex justify-between"><span class="text-gray-500">Date</span><span class="font-medium"><?php echo e($p->purchase_date->format('Y-m-d')); ?></span></div>
                       <div>
                         <div class="text-gray-500">Description</div>

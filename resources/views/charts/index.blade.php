@@ -53,23 +53,53 @@
   </form>
 
   <section class="border rounded p-4 bg-white">
-    <h2 class="text-sm font-medium text-gray-700 mb-3">Income vs Expenses</h2>
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-medium text-gray-700">Income vs Expenses</h2>
+    </div>
     <canvas id="rangeChart" height="160"></canvas>
+    <!-- Mobile month navigator (below chart) -->
+    <div class="sm:hidden mt-3 flex items-center justify-between">
+      <button type="button" id="prevMonthBtn" class="px-3 py-1.5 text-xs border rounded"></button>
+      <button type="button" id="nextMonthBtn" class="px-3 py-1.5 text-xs border rounded"></button>
+    </div>
   </section>
 </div>
 
 <script>
-  const ctx = document.getElementById('rangeChart').getContext('2d');
+  const canvas = document.getElementById('rangeChart');
+  const ctx = canvas.getContext('2d');
   const yMin = @json($yMin);
   const yMax = @json($yMax);
+
+  // Prepare datasets and labels; trim for mobile
+  const rawLabels = @json($labels);
+  const rawPurchases = @json($purchases);
+  const rawSales = @json($sales);
+  const rawExpenses = @json($expenses);
+
+  const isMobile = window.matchMedia('(max-width: 639px)').matches; // Tailwind sm breakpoint
+  let labels = rawLabels;
+  let purchases = rawPurchases;
+  let sales = rawSales;
+  let expenses = rawExpenses;
+  if (isMobile) {
+    const start = Math.max(0, rawLabels.length - 1);
+    labels = rawLabels.slice(start);
+    purchases = rawPurchases.slice(start);
+    sales = rawSales.slice(start);
+    expenses = rawExpenses.slice(start);
+    // Increase height for readability on mobile
+    canvas.height = 300;
+  }
+
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: @json($labels),
+      labels,
       datasets: [
-        { label: 'Purchases', backgroundColor: '#ef4444', data: @json($purchases) },
-        { label: 'Sales', backgroundColor: '#22c55e', data: @json($sales) },
-        { label: 'Expenses', backgroundColor: '#3b82f6', data: @json($expenses) }
+        { label: 'Purchases', backgroundColor: '#ef4444', data: purchases },
+        { label: 'Sales', backgroundColor: '#22c55e', data: sales },
+        { label: 'Expenses', backgroundColor: '#3b82f6', data: expenses }
       ]
     },
     options: {
@@ -83,5 +113,52 @@
       }
     }
   });
+
+  // Mobile month navigation: adjusts start/end months and reloads
+  if (isMobile) {
+    const startDateStr = @json($range['start_date']); // e.g., '2025-01-01'
+    const endDateStr = @json($range['end_date']);
+    // Use end date as the current month cursor
+    function yyyymm(date) {
+      const y = date.getFullYear();
+      const m = (date.getMonth() + 1).toString().padStart(2, '0');
+      return `${y}-${m}`;
+    }
+    function shiftMonth(isoDateStr, delta) {
+      const d = new Date(isoDateStr);
+      d.setMonth(d.getMonth() + delta);
+      return yyyymm(d);
+    }
+    function monthName(isoDateStr) {
+      const d = new Date(isoDateStr);
+      return d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+    }
+    function goToMonth(ym) {
+      const params = new URLSearchParams(window.location.search);
+      // Lock to a single month: start = end = ym
+      params.set('start_date', ym);
+      params.set('end_date', ym);
+      window.location.search = params.toString();
+    }
+    const currentYM = yyyymm(new Date(endDateStr));
+    const prevBtn = document.getElementById('prevMonthBtn');
+    const nextBtn = document.getElementById('nextMonthBtn');
+    if (prevBtn && nextBtn) {
+      // Set button labels with month names
+      const prevYM = shiftMonth(`${currentYM}-01`, -1);
+      const nextYM = shiftMonth(`${currentYM}-01`, 1);
+      prevBtn.textContent = `← ${monthName(`${prevYM}-01`)}`;
+      nextBtn.textContent = `${monthName(`${nextYM}-01`)} →`;
+
+      prevBtn.addEventListener('click', () => {
+        const prev = shiftMonth(`${currentYM}-01`, -1);
+        goToMonth(prev);
+      });
+      nextBtn.addEventListener('click', () => {
+        const next = shiftMonth(`${currentYM}-01`, 1);
+        goToMonth(next);
+      });
+    }
+  }
 </script>
 @endsection

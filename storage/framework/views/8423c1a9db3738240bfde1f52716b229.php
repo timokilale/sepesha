@@ -13,8 +13,9 @@
         <thead class="bg-gray-50">
           <tr>
             <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-            <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+            <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Price</th>
             <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Qty</th>
+            <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
             <th class="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Date</th>
             <th class="px-2 sm:px-4 py-2 text-right">Actions</th>
           </tr>
@@ -24,10 +25,11 @@
           <tr>
             <td class="px-2 sm:px-4 py-2 text-gray-800">
               <div class="font-medium"><?php echo e($s->purchase->item_name); ?></div>
-              <div class="text-sm text-gray-500 sm:hidden">Qty: <?php echo e($s->quantity_sold); ?> • <?php echo e($s->sale_date->format('M d, Y')); ?></div>
+              <div class="text-sm text-gray-500 sm:hidden">Qty: <?php echo e($s->display_quantity); ?> <?php echo e($s->display_unit); ?> • TZS <?php echo e(number_format($s->display_price,2)); ?> • <?php echo e($s->sale_date->format('M d, Y')); ?></div>
             </td>
-            <td class="px-2 sm:px-4 py-2 font-medium">TZS <?php echo e(number_format($s->selling_price,2)); ?></td>
-            <td class="px-2 sm:px-4 py-2 hidden sm:table-cell"><?php echo e($s->quantity_sold); ?></td>
+            <td class="px-2 sm:px-4 py-2 font-medium hidden sm:table-cell">TZS <?php echo e(number_format($s->display_price,2)); ?></td>
+            <td class="px-2 sm:px-4 py-2 hidden sm:table-cell"><?php echo e($s->display_quantity); ?> <?php echo e($s->display_unit); ?></td>
+            <td class="px-2 sm:px-4 py-2">TZS <?php echo e(number_format($s->quantity_sold * $s->selling_price, 2)); ?></td>
             <td class="px-2 sm:px-4 py-2 hidden md:table-cell"><?php echo e($s->sale_date->format('Y-m-d')); ?></td>
             <td class="px-2 sm:px-4 py-2 text-right">
               <div x-data="{ open: false }" class="flex flex-col items-end gap-1 justify-end">
@@ -49,8 +51,9 @@
                     </div>
                     <div class="space-y-2 text-sm text-gray-800">
                       <div class="flex justify-between"><span class="text-gray-500">Item</span><span class="font-medium"><?php echo e($s->purchase->item_name); ?></span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Selling Price</span><span class="font-medium">TZS <?php echo e(number_format($s->selling_price,2)); ?></span></div>
-                      <div class="flex justify-between"><span class="text-gray-500">Quantity Sold</span><span class="font-medium"><?php echo e($s->quantity_sold); ?></span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Selling Price</span><span class="font-medium">TZS <?php echo e(number_format($s->display_price,2)); ?> per <?php echo e($s->display_unit); ?></span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Quantity Sold</span><span class="font-medium"><?php echo e($s->display_quantity); ?> <?php echo e($s->display_unit); ?></span></div>
+                      <div class="flex justify-between"><span class="text-gray-500">Total</span><span class="font-medium">TZS <?php echo e(number_format($s->quantity_sold * $s->selling_price, 2)); ?></span></div>
                       <div class="flex justify-between"><span class="text-gray-500">Date</span><span class="font-medium"><?php echo e($s->sale_date->format('Y-m-d')); ?></span></div>
                       <div>
                         <div class="text-gray-500">Purchase Description</div>
@@ -66,7 +69,7 @@
             </td>
           </tr>
           <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-          <tr><td colspan="5" class="px-2 sm:px-4 py-4 text-gray-500">No sales yet.</td></tr>
+          <tr><td colspan="6" class="px-2 sm:px-4 py-4 text-gray-500">No sales yet.</td></tr>
           <?php endif; ?>
         </tbody>
       </table>

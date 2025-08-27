@@ -22,8 +22,7 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        $purchases = Auth::user()->purchases()
-            ->with('sales')
+        $purchases = Purchase::with('sales')
             ->orderBy('purchase_date', 'desc')
             ->paginate(10);
             
@@ -35,7 +34,7 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        $items = Auth::user()->items()->orderBy('name')->get();
+        $items = Item::orderBy('name')->get();
         return view('purchases.create', compact('items'));
     }
 
@@ -44,34 +43,57 @@ class PurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $baseRules = [
             'item_id' => 'required|exists:items,id,deleted_at,NULL',
             'purchase_date' => 'required|date',
             'description' => 'nullable|string',
-            // carton-based required inputs
-            'cartons' => 'required|integer|min:1',
-            'units_per_carton' => 'required|integer|min:1',
-            'carton_cost' => 'required|numeric|min:0',
-        ]);
+            'product_type' => 'required|in:beverage,meat',
+        ];
+        $validated = $request->validate($baseRules);
 
         $validated['user_id'] = Auth::id();
 
-        // Ensure selected item belongs to this user and set display name
-        $item = Item::where('id', $validated['item_id'])->where('user_id', Auth::id())->first();
+        // Ensure selected item exists and set display name (shop-wide)
+        $item = Item::where('id', $validated['item_id'])->first();
         if (!$item) {
             abort(422, 'Selected item is invalid.');
         }
         $validated['item_name'] = $item->name;
 
-        // Compute quantity (total bottles) and unit cost per bottle from cartons
-        $cartons = (int) $validated['cartons'];
-        $unitsPerCarton = (int) $validated['units_per_carton'];
-        $cartonCost = (float) $validated['carton_cost'];
-
-        $totalUnits = $cartons * $unitsPerCarton; // bottles
-        $validated['quantity'] = max(1, $totalUnits);
-        // Unit cost rounded up (TZS has no cents)
-        $validated['cost_price'] = (float) ceil($cartonCost / $unitsPerCarton);
+        if ($validated['product_type'] === 'meat' || $item->uom_type === 'weight') {
+            // Weight-based purchase: expect weight, price_per_kg
+            $more = $request->validate([
+                'weight' => 'required|numeric|min:0.1',
+                'price_per_kg' => 'required|numeric|min:0',
+            ]);
+            $weightKg = (float)$more['weight'];
+            $pricePerKg = (float)$more['price_per_kg'];
+            $totalCost = $weightKg * $pricePerKg;
+            
+            // Convert to grams for storage (base unit)
+            $qtyBase = $item->toBaseQuantity($weightKg, 'kg'); // grams
+            $validated['quantity'] = max(1, (int) $qtyBase);
+            $validated['cost_price'] = $validated['quantity'] > 0 ? round($totalCost / $validated['quantity'], 4) : 0;
+            
+            // Null out carton fields
+            $validated['cartons'] = null;
+            $validated['units_per_carton'] = null;
+            $validated['carton_cost'] = null;
+        } else {
+            // Carton-based purchase (beverage/volume items)
+            $more = $request->validate([
+                'cartons' => 'required|integer|min:1',
+                'units_per_carton' => 'required|integer|min:1',
+                'carton_cost' => 'required|numeric|min:0',
+            ]);
+            $cartons = (int) $more['cartons'];
+            $unitsPerCarton = (int) $more['units_per_carton'];
+            $cartonCost = (float) $more['carton_cost'];
+            $totalUnits = $cartons * $unitsPerCarton; // bottles/pieces
+            $validated['quantity'] = max(1, $totalUnits);
+            $validated['cost_price'] = round($cartonCost / max(1, $unitsPerCarton), 2);
+            $validated = array_merge($validated, $more);
+        }
 
         Purchase::create($validated);
 
@@ -84,7 +106,7 @@ class PurchaseController extends Controller
      */
     public function show($id)
     {
-        $purchase = Auth::user()->purchases()->with('sales')->findOrFail($id);
+        $purchase = Purchase::with('sales')->findOrFail($id);
         return view('purchases.show', compact('purchase'));
     }
 
@@ -93,8 +115,8 @@ class PurchaseController extends Controller
      */
     public function edit($id)
     {
-        $purchase = Auth::user()->purchases()->findOrFail($id);
-        $items = Auth::user()->items()->orderBy('name')->get();
+        $purchase = Purchase::findOrFail($id);
+        $items = Item::orderBy('name')->get();
         return view('purchases.edit', compact('purchase','items'));
     }
 
@@ -103,30 +125,53 @@ class PurchaseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $purchase = Auth::user()->purchases()->findOrFail($id);
+        $purchase = Purchase::findOrFail($id);
 
-        $validated = $request->validate([
+        $baseRules = [
             'item_id' => 'required|exists:items,id,deleted_at,NULL',
             'purchase_date' => 'required|date',
             'description' => 'nullable|string',
-            'cartons' => 'required|integer|min:1',
-            'units_per_carton' => 'required|integer|min:1',
-            'carton_cost' => 'required|numeric|min:0',
-        ]);
+        ];
+        $validated = $request->validate($baseRules);
 
-        // Compute total bottles and per-bottle unit cost
-        $cartons = (int) $validated['cartons'];
-        $unitsPerCarton = (int) $validated['units_per_carton'];
-        $cartonCost = (float) $validated['carton_cost'];
-        $validated['quantity'] = $cartons * $unitsPerCarton;
-        $validated['cost_price'] = (float) ceil($cartonCost / $unitsPerCarton);
-
-        // Ensure selected item belongs to this user and set display name
-        $item = Item::where('id', $validated['item_id'])->where('user_id', Auth::id())->first();
+        // Ensure selected item exists and set display name (shop-wide)
+        $item = Item::where('id', $validated['item_id'])->first();
         if (!$item) {
             abort(422, 'Selected item is invalid.');
         }
         $validated['item_name'] = $item->name;
+
+        // Check if this is a weight-based update (meat products)
+        $productType = $request->input('product_type', ($item->uom_type === 'weight' ? 'meat' : 'beverage'));
+        
+        if ($productType === 'meat' || $item->uom_type === 'weight') {
+            $more = $request->validate([
+                'weight' => 'required|numeric|min:0.1',
+                'price_per_kg' => 'required|numeric|min:0',
+            ]);
+            $weightKg = (float)$more['weight'];
+            $pricePerKg = (float)$more['price_per_kg'];
+            $totalCost = $weightKg * $pricePerKg;
+            
+            $qtyBase = $item->toBaseQuantity($weightKg, 'kg');
+            $validated['quantity'] = max(1, (int) $qtyBase);
+            $validated['cost_price'] = $validated['quantity'] > 0 ? round($totalCost / $validated['quantity'], 4) : 0;
+            $validated['cartons'] = null;
+            $validated['units_per_carton'] = null;
+            $validated['carton_cost'] = null;
+        } else {
+            $more = $request->validate([
+                'cartons' => 'required|integer|min:1',
+                'units_per_carton' => 'required|integer|min:1',
+                'carton_cost' => 'required|numeric|min:0',
+            ]);
+            $cartons = (int) $more['cartons'];
+            $unitsPerCarton = (int) $more['units_per_carton'];
+            $cartonCost = (float) $more['carton_cost'];
+            $validated['quantity'] = $cartons * $unitsPerCarton;
+            $validated['cost_price'] = round($cartonCost / max(1, $unitsPerCarton), 2);
+            $validated = array_merge($validated, $more);
+        }
 
         $purchase->update($validated);
 
@@ -139,7 +184,7 @@ class PurchaseController extends Controller
      */
     public function destroy($id)
     {
-        $purchase = Auth::user()->purchases()->findOrFail($id);
+        $purchase = Purchase::findOrFail($id);
         $purchase->delete();
 
         return redirect()->route('purchases.index')

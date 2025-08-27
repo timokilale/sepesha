@@ -22,8 +22,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $sales = Auth::user()->sales()
-            ->with('purchase')
+        $sales = Sale::with('purchase')
             ->orderBy('sale_date', 'desc')
             ->paginate(10);
             
@@ -35,8 +34,7 @@ class SaleController extends Controller
      */
     public function create()
     {
-        $query = Auth::user()->purchases()
-            ->with(['item', 'sales'])
+        $query = Purchase::with(['item', 'sales'])
             ->whereRaw('quantity > (SELECT COALESCE(SUM(quantity_sold), 0) FROM sales WHERE purchase_id = purchases.id)')
             ->where(function ($q) {
                 // Keep purchases without an item (ad-hoc), or with a non-deleted item
@@ -58,37 +56,58 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $baseRules = [
             'purchase_id' => 'required|exists:purchases,id',
-            'selling_price' => 'required|numeric|min:0',
             'sale_date' => 'required|date',
-            'quantity_sold' => 'required|integer|min:1',
             'notes' => 'nullable|string',
-        ]);
+            'product_type' => 'required|in:beverage,meat',
+        ];
+        $validated = $request->validate($baseRules);
 
-        // Verify the purchase belongs to the authenticated user
-        $purchase = Auth::user()->purchases()->findOrFail($validated['purchase_id']);
+        // Find the purchase globally (shared shop)
+        $purchase = Purchase::with('item')->findOrFail($validated['purchase_id']);
 
-        // Bottle-only: requested quantity is already in bottles
-        $requestedBottles = (int) $validated['quantity_sold'];
-
-        // Check if there's enough quantity available (in bottles)
-        $remainingQuantity = $purchase->quantity - $purchase->sales->sum('quantity_sold');
-        if ($requestedBottles > $remainingQuantity) {
-            return back()->withErrors([
-                'quantity_sold' => 'Not enough quantity available. Remaining bottles: ' . $remainingQuantity
-            ])->withInput();
+        if ($validated['product_type'] === 'meat' || ($purchase->item && $purchase->item->uom_type === 'weight')) {
+            // Weight-based sale: expect weight_sold, price_per_kg_sale
+            $more = $request->validate([
+                'weight_sold' => 'required|numeric|min:0.1',
+                'price_per_kg_sale' => 'required|numeric|min:0',
+            ]);
+            $weightKg = (float)$more['weight_sold'];
+            $pricePerKg = (float)$more['price_per_kg_sale'];
+            
+            // Convert to grams for storage (base unit)
+            $qtyBase = $purchase->item->toBaseQuantity($weightKg, 'kg'); // grams
+            $requestedQuantity = (int) $qtyBase;
+            $perUnitPrice = $pricePerKg / 1000; // price per gram
+        } else {
+            // Beverage sale: expect quantity_sold, selling_price
+            $more = $request->validate([
+                'quantity_sold' => 'required|integer|min:1',
+                'selling_price' => 'required|numeric|min:0',
+            ]);
+            $requestedQuantity = (int) $more['quantity_sold'];
+            $perUnitPrice = (float) $more['selling_price'];
         }
 
-        // Store per-bottle price and bottle quantity
-        $perBottlePrice = (float) $validated['selling_price'];
+        // Check if there's enough quantity available
+        $remainingQuantity = $purchase->quantity - $purchase->sales->sum('quantity_sold');
+        if ($requestedQuantity > $remainingQuantity) {
+            $unitName = ($purchase->item && $purchase->item->uom_type === 'weight') ? 'kg' : 'bottles';
+            $displayRemaining = ($purchase->item && $purchase->item->uom_type === 'weight') 
+                ? $purchase->item->formatBaseQuantity($remainingQuantity)
+                : $remainingQuantity . ' ' . $unitName;
+            return back()->withErrors([
+                'quantity_sold' => 'Not enough quantity available. Remaining: ' . $displayRemaining
+            ])->withInput();
+        }
 
         $toCreate = [
             'user_id' => Auth::id(),
             'purchase_id' => (int) $validated['purchase_id'],
-            'selling_price' => $perBottlePrice,
+            'selling_price' => $perUnitPrice,
             'sale_date' => $validated['sale_date'],
-            'quantity_sold' => $requestedBottles,
+            'quantity_sold' => $requestedQuantity,
             'notes' => $validated['notes'] ?? null,
         ];
 
@@ -103,8 +122,8 @@ class SaleController extends Controller
                 $itemId,
                 $itemName,
                 $validated['sale_date'],
-                (int) $requestedBottles,
-                (float) $perBottlePrice * (int) $requestedBottles
+                (int) $requestedQuantity,
+                (float) $perUnitPrice * (int) $requestedQuantity
             );
         } catch (\Throwable $e) {
             // swallow aggregate errors to not block primary flow
@@ -119,7 +138,7 @@ class SaleController extends Controller
      */
     public function show($id)
     {
-        $sale = Auth::user()->sales()->with('purchase')->findOrFail($id);
+        $sale = Sale::with('purchase')->findOrFail($id);
         return view('sales.show', compact('sale'));
     }
 
@@ -128,9 +147,8 @@ class SaleController extends Controller
      */
     public function edit($id)
     {
-        $sale = Auth::user()->sales()->findOrFail($id);
-        $purchases = Auth::user()->purchases()
-            ->with(['item', 'sales'])
+        $sale = Sale::findOrFail($id);
+        $purchases = Purchase::with(['item', 'sales'])
             ->where(function ($q) use ($sale) {
                 $q->whereNull('item_id')
                   ->orWhereHas('item', function ($iq) {
@@ -147,7 +165,7 @@ class SaleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $sale = Auth::user()->sales()->findOrFail($id);
+        $sale = Sale::findOrFail($id);
 
         $validated = $request->validate([
             'purchase_id' => 'required|exists:purchases,id',
@@ -157,11 +175,8 @@ class SaleController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Verify the purchase belongs to the authenticated user
+        // Shared shop: ensure purchase exists
         $purchase = Purchase::findOrFail($validated['purchase_id']);
-        if ($purchase->user_id !== Auth::id()) {
-            abort(403);
-        }
 
         // Bottle-only: requested quantity is already in bottles
         $requestedBottles = (int) $validated['quantity_sold'];
@@ -193,7 +208,7 @@ class SaleController extends Controller
      */
     public function destroy($id)
     {
-        $sale = Auth::user()->sales()->findOrFail($id);
+        $sale = Sale::findOrFail($id);
         $sale->delete();
 
         return redirect()->route('sales.index')

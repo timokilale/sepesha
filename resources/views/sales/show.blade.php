@@ -19,6 +19,10 @@
         <div class="font-medium text-gray-900">{{ $sale->quantity_sold }}</div>
       </div>
       <div>
+        <div class="text-gray-500 text-sm">Total Amount</div>
+        <div class="font-medium text-gray-900">TZS {{ number_format($sale->quantity_sold * $sale->selling_price, 2) }}</div>
+      </div>
+      <div>
         <div class="text-gray-500 text-sm">Sale Date</div>
         <div class="font-medium text-gray-900">{{ $sale->sale_date->format('Y-m-d') }}</div>
       </div>

@@ -26,38 +26,42 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        // Get analytics data
-        // Purchases: unit cost × quantity across all purchases
-        $totalPurchases = (float) $user->purchases()->get(['cost_price','quantity'])->sum(function ($p) {
-            return (float) $p->cost_price * (int) $p->quantity;
-        });
+        // Get analytics data (totals are global and visible to all users; charts/monthly only for admins)
+        $monthlyData = ['months' => [], 'purchases' => [], 'sales' => []];
+
+        // Purchases: use total_cost attribute which handles both carton-based and direct cost purchases
+        $totalPurchases = (float) \App\Models\Purchase::query()
+            ->get()
+            ->sum(function ($p) {
+                return $p->total_cost; // This accessor handles both carton-based and meat purchases
+            });
         // Sales: price × quantity across all sales
-        $totalSales = (float) $user->sales()->select('selling_price', 'quantity_sold')->get()
+        $totalSales = (float) \App\Models\Sale::query()->select('selling_price', 'quantity_sold')->get()
             ->sum(function ($sale) {
                 return (float) $sale->selling_price * (int) $sale->quantity_sold;
             });
         // Expenses: sum of expense amounts
-        $totalExpenses = (float) $user->expenses()->sum('amount');
+        $totalExpenses = (float) Expense::query()->sum('amount');
         // Profit: sales − purchases − expenses
         $totalProfit = $totalSales - $totalPurchases - $totalExpenses;
+
+        if ($user->isAdmin()) {
+            // Get monthly data for charts
+            $monthlyData = $this->getMonthlyData();
+        }
         
         // Get recent purchases and sales
-        $recentPurchases = $user->purchases()
-            ->orderBy('purchase_date', 'desc')
+        $recentPurchases = \App\Models\Purchase::orderBy('purchase_date', 'desc')
             ->take(5)
             ->get();
             
-        $recentSales = $user->sales()
-            ->with('purchase')
+        $recentSales = \App\Models\Sale::with('purchase')
             ->orderBy('sale_date', 'desc')
             ->take(5)
             ->get();
-        
-        // Get monthly data for charts
-        $monthlyData = $this->getMonthlyData($user);
 
         // Products for homepage grid
-        $items = \App\Models\Item::where('user_id', $user->id)->with(['purchases.sales'])->orderBy('name')->get();
+        $items = \App\Models\Item::with(['purchases.sales'])->orderBy('name')->get();
         // Compute stock per item
         $items = $items->map(function ($item) {
             $purchased = (int) $item->purchases->sum('quantity');
@@ -80,7 +84,7 @@ class DashboardController extends Controller
     /**
      * Get monthly purchase and sales data for charts.
      */
-    private function getMonthlyData($user)
+    private function getMonthlyData()
     {
         $months = [];
         $purchases = [];
@@ -90,12 +94,16 @@ class DashboardController extends Controller
             $date = Carbon::now()->subMonths($i);
             $monthName = $date->format('M Y');
             
-            $monthlyPurchases = (float) $user->purchases()
+            // Sum total costs for the month (handles both carton-based and direct cost purchases)
+            $monthlyPurchases = (float) \App\Models\Purchase::query()
                 ->whereYear('purchase_date', $date->year)
                 ->whereMonth('purchase_date', $date->month)
-                ->sum('cost_price');
+                ->get()
+                ->sum(function ($p) {
+                    return $p->total_cost; // This accessor handles both carton-based and meat purchases
+                });
                 
-            $monthlySales = (float) $user->sales()
+            $monthlySales = (float) \App\Models\Sale::query()
                 ->whereYear('sale_date', $date->year)
                 ->whereMonth('sale_date', $date->month)
                 ->get(['selling_price', 'quantity_sold'])

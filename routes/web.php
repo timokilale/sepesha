@@ -8,8 +8,10 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\MeatController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\LossController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,6 +76,9 @@ Route::resource('items', ItemController::class)->middleware(['auth']);
 Route::get('/item', function () {
     return redirect()->route('items.index');
 })->middleware(['auth'])->name('item');
+// Meat products (separate controller)
+Route::get('/meat/create', [MeatController::class, 'create'])->middleware(['auth'])->name('meat.create');
+Route::post('/meat', [MeatController::class, 'store'])->middleware(['auth'])->name('meat.store');
 
 // Single-segment alternatives for Items
 Route::middleware(['auth'])->group(function () {
@@ -82,13 +87,16 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/item-{id}', [ItemController::class, 'update'])->whereNumber('id')->name('items.update.single');
     Route::patch('/item-{id}', [ItemController::class, 'update'])->whereNumber('id');
     Route::delete('/item-{id}-delete', [ItemController::class, 'destroy'])->whereNumber('id')->name('items.destroy.single');
+    // Enable/Disable (soft) instead of delete
+    Route::post('/item-{id}-disable', [ItemController::class, 'disable'])->whereNumber('id')->name('items.disable.single');
+    Route::post('/item-{id}-enable', [ItemController::class, 'enable'])->whereNumber('id')->name('items.enable.single');
 });
 
-// Expenses (operating costs)
-Route::resource('expenses', ExpenseController::class)->middleware(['auth']);
+// Expenses (operating costs) - Admin only
+Route::resource('expenses', ExpenseController::class)->middleware(['auth', 'admin']);
 
-// Single-segment alternatives to avoid blocked nested numeric paths
-Route::middleware(['auth'])->group(function () {
+// Single-segment alternatives to avoid blocked nested numeric paths - Admin only
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/expense-{id}', [ExpenseController::class, 'show'])->whereNumber('id')->name('expenses.show.single');
     Route::get('/expense-{id}-edit', [ExpenseController::class, 'edit'])->whereNumber('id')->name('expenses.edit.single');
     Route::put('/expense-{id}', [ExpenseController::class, 'update'])->whereNumber('id')->name('expenses.update.single');
@@ -108,10 +116,24 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-// Charts (date-range analytics)
-Route::middleware(['auth'])->group(function () {
+// Charts (date-range analytics) - Admin only
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/charts', [ChartController::class, 'index'])->name('charts.index');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+});
+
+// User Management - Admin only
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::resource('users', \App\Http\Controllers\UserController::class);
+    Route::post('/users/{id}/reset-password', [\App\Http\Controllers\UserController::class, 'resetPassword'])->name('users.reset-password');
+});
+
+// Losses (spoilage/expired/damage)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/losses/create', [LossController::class, 'create'])->name('losses.create');
+    Route::post('/losses', [LossController::class, 'store'])->name('losses.store');
+    // Single-segment helper paths
+    Route::get('/loss-add', [LossController::class, 'create'])->name('losses.create.single');
 });
 
 // (removed old /home redirect block)
